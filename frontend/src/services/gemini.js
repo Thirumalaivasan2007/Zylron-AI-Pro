@@ -66,7 +66,7 @@ export const chatWithGemini = async (prompt, persona = 'standard', pdfContext = 
         } else if (errorMessage.includes('403')) {
             errorMessage = "Access Denied: Backend Proxy failed authentication. Check GEMINI_API_KEY in backend/.env";
         } else if (error.message === "Network Error") {
-            errorMessage = "Zylron Engine: Network Error. Ensure the backend server is running on port 5000.";
+            errorMessage = "Zylron Engine: Network Error. The frontend cannot reach the Render backend. This usually means the backend is sleeping (Render free tier takes 50s to wake up), the Render URL is wrong, or CORS blocked it.";
         }
         
         throw new Error(`Gemini Proxy Error: ${errorMessage}`);
