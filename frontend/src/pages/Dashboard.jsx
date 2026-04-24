@@ -1168,6 +1168,7 @@ const Dashboard = () => {
                                                         </div>
                                                     </div>
                                                 )}
+
                                                 {!msg.isSystem && msg.type !== 'error' && (
                                                     <div className="mt-4 pt-3 border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between opacity-40 group-hover/msg:opacity-100 transition-all">
                                                         <div className="flex items-center gap-1">
@@ -1179,7 +1180,7 @@ const Dashboard = () => {
                                                             </button>
                                                             {detectWebCode(msg.content) && (
                                                                 <button type="button" onClick={() => handleCodePreview(msg.content)} className="ml-2 flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 dark:bg-cyan-500/10 text-emerald-600 dark:text-cyan-400 text-[10px] font-bold uppercase tracking-wider hover:opacity-80 transition-all">
-                                                                    <Play size={12} /> Live Preview
+                                                                    <Layout size={12} /> Live Preview
                                                                 </button>
                                                             )}
                                                         </div>
