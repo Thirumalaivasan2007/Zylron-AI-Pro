@@ -220,6 +220,7 @@ const Dashboard = () => {
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [feedbackToast, setFeedbackToast] = useState(null);
     const [isMemoryEnabled, setIsMemoryEnabled] = useState(localStorage.memory === 'true');
+    const [showScrollButton, setShowScrollButton] = useState(false);
 
     const messagesEndRef = useRef(null);
     const scrollContainerRef = useRef(null);
@@ -306,8 +307,23 @@ const Dashboard = () => {
         setIsLoading(false);
         if (publicId) {
             const url = `${window.location.origin}/share/${publicId}`;
-            navigator.clipboard.writeText(url);
-            setFeedbackToast("Share link copied to clipboard! 🔗");
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Zylron AI Chat',
+                        text: 'Check out my conversation with Zylron AI!',
+                        url: url
+                    });
+                    setFeedbackToast("Shared successfully! ✨");
+                } catch (err) {
+                    navigator.clipboard.writeText(url);
+                    setFeedbackToast("Share link copied to clipboard! 🔗");
+                }
+            } else {
+                navigator.clipboard.writeText(url);
+                setFeedbackToast("Share link copied to clipboard! 🔗");
+            }
         }
     };
 
@@ -621,6 +637,9 @@ const Dashboard = () => {
             setCurrentSessionId(sessionId);
             setMessages(session.messages || []);
             if (window.innerWidth < 1024) setSidebarOpen(false);
+            
+            // Give time for state to update then scroll
+            setTimeout(() => scrollToBottom(), 100);
         }
     };
 
@@ -672,6 +691,23 @@ const Dashboard = () => {
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
+
+    // Scroll Monitoring
+    useEffect(() => {
+        const handleScroll = () => {
+            if (scrollContainerRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+                const isNearBottom = scrollHeight - scrollTop - clientHeight < 200;
+                setShowScrollButton(!isNearBottom && messages.length > 3);
+            }
+        };
+
+        const container = scrollContainerRef.current;
+        if (container) {
+            container.addEventListener('scroll', handleScroll);
+        }
+        return () => container?.removeEventListener('scroll', handleScroll);
+    }, [messages]);
 
     const sendMessage = async (e) => {
         if (e && e.preventDefault) e.preventDefault();
@@ -1257,6 +1293,16 @@ const Dashboard = () => {
                     }
                 }}
             />
+
+            {/* Scroll to Bottom Button */}
+            {showScrollButton && (
+                <button
+                    onClick={scrollToBottom}
+                    className="fixed bottom-32 right-6 z-30 p-3 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-emerald-500/30 dark:border-cyan-500/30 text-emerald-600 dark:text-cyan-400 shadow-xl hover:scale-110 transition-all animate-bounce"
+                >
+                    <ChevronDown size={24} className="animate-pulse" />
+                </button>
+            )}
 
             {/* Feedback Toast */}
             {feedbackToast && (
