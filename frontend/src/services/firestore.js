@@ -75,16 +75,27 @@ export const deleteCloudChat = async (sessionId) => {
     }
 };
 
-// Phase 10: Public Chat Sharing
+// Public Chat Sharing - Optimized for Speed
 export const createPublicShare = async (messages, persona) => {
     try {
-        const publicId = Math.random().toString(36).substring(2, 15);
+        // Payload Trimming: Remove non-essential UI state to speed up upload
+        const trimmedMessages = messages.map(m => ({
+            type: m.type,
+            content: m.content,
+            imageUrl: m.imageUrl || null,
+            isSystem: m.isSystem || false
+        }));
+
+        const publicId = Math.random().toString(36).substring(2, 10);
         const shareRef = doc(db, 'public_shares', publicId);
+        
+        // Fast Write
         await setDoc(shareRef, {
-            messages,
+            messages: trimmedMessages,
             persona,
             createdAt: serverTimestamp()
         });
+        
         return publicId;
     } catch (error) {
         console.error("Error creating public share:", error);
