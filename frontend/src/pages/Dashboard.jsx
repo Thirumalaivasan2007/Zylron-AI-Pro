@@ -846,7 +846,7 @@ const Dashboard = () => {
 
                         <button 
                             onClick={() => setIsAutoSpeak(!isAutoSpeak)}
-                            className={`p-2 rounded-full transition-all focus:outline-none ${isAutoSpeak ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`}
+                            className={`p-2 rounded-full transition-all focus:outline-none hidden sm:flex ${isAutoSpeak ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`}
                             title="Toggle Auto-Speak (TTS)"
                         >
                             <Headphones size={20} />
@@ -855,7 +855,7 @@ const Dashboard = () => {
                         <button 
                             onClick={handleShareChat}
                             disabled={messages.length === 0}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed hidden sm:flex"
                             title="Share Conversation"
                         >
                             <Share2 size={20} />
@@ -864,7 +864,7 @@ const Dashboard = () => {
                         <button 
                             onClick={exportToPDF}
                             disabled={messages.length === 0}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed hidden sm:flex"
                             title="Download PDF Report"
                         >
                             <FileDown size={20} />
@@ -872,7 +872,7 @@ const Dashboard = () => {
 
                         <button 
                             onClick={() => setIsTourActive(true)}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none hidden sm:flex"
                             title="Start Guided Tour"
                         >
                             <HelpCircle size={20} />
@@ -889,7 +889,7 @@ const Dashboard = () => {
                         <button 
                             onClick={exportToMarkdown}
                             disabled={messages.length === 0}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed hidden md:flex"
                             title="Export to Markdown"
                         >
                             <Download size={20} />
@@ -928,7 +928,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Main Chat Area */}
-                <div {...getRootProps()} ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth">
+                <div {...getRootProps()} ref={scrollContainerRef} className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-8 relative scroll-smooth">
                     <input {...getInputProps()} />
                     
                     {/* Drag and Drop Overlay */}
@@ -1072,7 +1072,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Glassmorphism Input Area */}
-                <div className="p-4 bg-transparent relative z-10 w-full mb-2">
+                <div className="p-2 sm:p-4 bg-transparent relative z-10 w-full mb-2">
                     <div className="max-w-4xl mx-auto flex flex-col gap-3">
                         
                         {/* Status / Active File Banners */}
@@ -1109,7 +1109,7 @@ const Dashboard = () => {
                         </div>
 
                         {/* Quick Prompt Library */}
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide px-1">
+                        <div className="flex gap-2 w-full max-w-full overflow-x-auto pb-2 scrollbar-hide px-1" style={{ WebkitOverflowScrolling: 'touch' }}>
                             {QUICK_PROMPTS.map((qp, idx) => (
                                 <button
                                     key={idx}
