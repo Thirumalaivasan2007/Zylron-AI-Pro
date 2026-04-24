@@ -10,7 +10,7 @@ const ai = new GoogleGenAI({ apiKey: API_KEY });
 // Secure Gemini Proxy Route
 router.post('/proxy', async (req, res) => {
     try {
-        const { prompt, history, persona, systemInstruction, image, isSearchMode } = req.body;
+        const { prompt, history, persona, systemInstruction, image, isSearchMode = false } = req.body;
 
         // 1. Zylron Search Intelligence Integration
         let searchContext = "";
