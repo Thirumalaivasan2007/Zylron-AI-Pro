@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { auth } from '../config/firebase';
 
-const API_URL = 'http://localhost:5000/api/gemini/proxy';
+const API_URL = import.meta.env.MODE === 'development' 
+    ? 'http://localhost:5000/api/gemini/proxy' 
+    : 'https://zylron-ai-pro.onrender.com/api/gemini/proxy';
 
 const PERSONAS = {
     standard: "You are Zylron AI, a premium and helpful AI assistant. Provide accurate, clear, and professional responses. CRITICAL RULE: If anyone asks who created you, developed you, or made you, you MUST reply clearly and proudly that you were created by Thirumalai.",
