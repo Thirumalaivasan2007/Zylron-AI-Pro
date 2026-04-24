@@ -796,10 +796,19 @@ const Dashboard = () => {
             parts: [{ text: m.content || "Attached an image." }]
         })).slice(-10);
 
-        // Phase 3: Image Generation Detection
-        if (userMsg.toLowerCase().startsWith('generate image') || userMsg.toLowerCase().startsWith('create an image')) {
+        // Phase 3: Image Generation Detection (Robust Neural Trigger)
+        const imageTriggers = ['generate image', 'create image', 'draw ', 'show me a picture', 'generate a picture', 'create an image'];
+        const isImageRequest = imageTriggers.some(t => userMsg.toLowerCase().includes(t));
+
+        if (isImageRequest) {
             setIsGeneratingImage(true);
-            const imagePrompt = userMsg.replace(/generate image|create an image/gi, '').trim();
+            // Extract the actual prompt by removing the triggers
+            let imagePrompt = userMsg;
+            imageTriggers.forEach(t => {
+                imagePrompt = imagePrompt.replace(new RegExp(t, 'gi'), '');
+            });
+            imagePrompt = imagePrompt.trim() || userMsg;
+
             const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(imagePrompt)}?width=1024&height=1024&seed=${Date.now()}&model=flux`;
             
             setMessages(prev => [...prev, { 
@@ -1096,54 +1105,48 @@ const Dashboard = () => {
                                                         </p>
                                                     </div>
                                                 ) : (
-                                                    <div className="flex flex-col">
+                                                    <div className="flex flex-col gap-4">
+                                                        {msg.imageUrl && (
+                                                            <div className="relative group/img rounded-2xl overflow-hidden border border-gray-200 dark:border-cyan-500/30 shadow-2xl animate-in zoom-in-95 duration-500">
+                                                                <img src={msg.imageUrl} alt="AI Generated" className="w-full h-auto object-cover max-h-[500px]" />
+                                                                <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover/img:opacity-100">
+                                                                    <button 
+                                                                        type="button"
+                                                                        onClick={() => window.open(msg.imageUrl, '_blank')}
+                                                                        className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:scale-110 transition-all"
+                                                                    >
+                                                                        <Download size={24} />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                         <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed prose-p:leading-relaxed prose-a:text-emerald-600 dark:prose-a:text-cyan-400 drop-shadow-none dark:drop-shadow-sm">
                                                             <TypewriterMarkdown text={msg.content} animate={msg.animate} />
                                                         </div>
-
-                                                        {/* Action Bar (Feedback, Copy, TTS) */}
-                                                        <div className="mt-4 pt-3 border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between opacity-40 group-hover/msg:opacity-100 transition-all">
-                                                            <div className="flex items-center gap-1">
-                                                                <button 
-                                                                    onClick={() => handleFeedback(idx, 'up')}
-                                                                    className={`p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all ${msg.feedback === 'up' ? 'text-emerald-500 dark:text-cyan-400' : 'text-gray-400'}`}
-                                                                    title="Good response"
-                                                                >
-                                                                    <ThumbsUp size={14} fill={msg.feedback === 'up' ? 'currentColor' : 'none'} />
+                                                    </div>
+                                                )}
+                                                {!msg.isSystem && msg.type !== 'error' && (
+                                                    <div className="mt-4 pt-3 border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between opacity-40 group-hover/msg:opacity-100 transition-all">
+                                                        <div className="flex items-center gap-1">
+                                                            <button type="button" onClick={() => handleFeedback(idx, 'up')} className={`p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all ${msg.feedback === 'up' ? 'text-emerald-500 dark:text-cyan-400' : 'text-gray-400'}`}>
+                                                                <ThumbsUp size={14} fill={msg.feedback === 'up' ? 'currentColor' : 'none'} />
+                                                            </button>
+                                                            <button type="button" onClick={() => handleFeedback(idx, 'down')} className={`p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all ${msg.feedback === 'down' ? 'text-red-500 dark:text-red-400' : 'text-gray-400'}`}>
+                                                                <ThumbsDown size={14} fill={msg.feedback === 'down' ? 'currentColor' : 'none'} />
+                                                            </button>
+                                                            {detectWebCode(msg.content) && (
+                                                                <button type="button" onClick={() => handleCodePreview(msg.content)} className="ml-2 flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 dark:bg-cyan-500/10 text-emerald-600 dark:text-cyan-400 text-[10px] font-bold uppercase tracking-wider hover:opacity-80 transition-all">
+                                                                    <Play size={12} /> Live Preview
                                                                 </button>
-                                                                <button 
-                                                                    onClick={() => handleFeedback(idx, 'down')}
-                                                                    className={`p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all ${msg.feedback === 'down' ? 'text-red-500 dark:text-red-400' : 'text-gray-400'}`}
-                                                                    title="Bad response"
-                                                                >
-                                                                    <ThumbsDown size={14} fill={msg.feedback === 'down' ? 'currentColor' : 'none'} />
-                                                                </button>
-                                                                {detectWebCode(msg.content) && (
-                                                                    <button 
-                                                                        onClick={() => handleCodePreview(msg.content)}
-                                                                        className="ml-2 flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 dark:bg-cyan-500/10 text-emerald-600 dark:text-cyan-400 text-[10px] font-bold uppercase tracking-wider hover:opacity-80 transition-all"
-                                                                    >
-                                                                        <Play size={12} /> Live Preview
-                                                                    </button>
-                                                                )}
-                                                            </div>
-
-                                                            <div className="flex items-center gap-2">
-                                                                <button 
-                                                                    onClick={() => copyToClipboard(msg.content, idx)}
-                                                                    className={`flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-all text-[10px] font-bold uppercase tracking-wider ${copiedIndex === idx ? 'text-emerald-500 dark:text-cyan-400' : 'text-gray-400'}`}
-                                                                >
-                                                                    {copiedIndex === idx ? <Check size={12} /> : <Copy size={12} />}
-                                                                    {copiedIndex === idx ? 'Copied' : 'Copy'}
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => speakText(msg.content, idx)}
-                                                                    className={`p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all ${isSpeakingIndex === idx ? 'text-emerald-500 dark:text-cyan-400 animate-pulse' : 'text-gray-400'}`}
-                                                                    title="Read Aloud"
-                                                                >
-                                                                    {isSpeakingIndex === idx ? <VolumeX size={14} /> : <Volume2 size={14} />}
-                                                                </button>
-                                                            </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <button type="button" onClick={() => copyToClipboard(msg.content, idx)} className={`flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-all text-[10px] font-bold uppercase tracking-wider ${copiedIndex === idx ? 'text-emerald-500 dark:text-cyan-400' : 'text-gray-400'}`}>
+                                                                {copiedIndex === idx ? <Check size={12} /> : <Copy size={12} />} {copiedIndex === idx ? 'Copied' : 'Copy'}
+                                                            </button>
+                                                            <button type="button" onClick={() => speakText(msg.content, idx)} className={`p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all ${isSpeakingIndex === idx ? 'text-emerald-500 dark:text-cyan-400 animate-pulse' : 'text-gray-400'}`}>
+                                                                {isSpeakingIndex === idx ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 )}
