@@ -317,6 +317,9 @@ const Dashboard = () => {
 
         try {
             // 2. Instant Feedback & Clipboard Copy (No Waiting)
+            await navigator.clipboard.writeText(url);
+            setFeedbackToast("Link copied to clipboard! 🔗");
+
             if (navigator.share) {
                 try {
                     await navigator.share({
@@ -324,15 +327,16 @@ const Dashboard = () => {
                         text: 'Check out my conversation with Zylron AI!',
                         url: url
                     });
+                    // If we reach here, it was successful
                     setFeedbackToast("Shared successfully! ✨");
                 } catch (err) {
-                    await navigator.clipboard.writeText(url);
-                    setFeedbackToast("Share link copied to clipboard! 🔗");
+                    // User cancelled or share failed, but link is already copied
+                    console.log("Native share dismissed");
                 }
-            } else {
-                await navigator.clipboard.writeText(url);
-                setFeedbackToast("Share link copied to clipboard! 🔗");
             }
+
+            // Auto-clear toast
+            setTimeout(() => setFeedbackToast(null), 4000);
 
             // 3. Background Sync (Firestore upload happens silently)
             const trimmedMessages = messages.map(m => ({
@@ -350,6 +354,7 @@ const Dashboard = () => {
             // Final fallback
             navigator.clipboard.writeText(url);
             setFeedbackToast("Link copied to clipboard! 🔗");
+            setTimeout(() => setFeedbackToast(null), 3000);
         }
     };
 
