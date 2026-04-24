@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { GoogleGenAI } = require('@google/genai');
+const { searchWeb } = require('../utils/searchEngine');
 
 const API_KEY = (process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || "").trim();
 const ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -9,7 +10,21 @@ const ai = new GoogleGenAI({ apiKey: API_KEY });
 // Secure Gemini Proxy Route
 router.post('/proxy', async (req, res) => {
     try {
-        const { prompt, history, persona, systemInstruction, image } = req.body;
+        const { prompt, history, persona, systemInstruction, image, isSearchMode } = req.body;
+
+        // 1. Zylron Search Intelligence Integration
+        let searchContext = "";
+        if (isSearchMode && prompt) {
+            try {
+                const searchResults = await searchWeb(prompt);
+                searchContext = `\n\n[REAL-TIME WEB INTELLIGENCE: Use these live results to answer accurately]\n${searchResults}\n`;
+            } catch (err) {
+                console.error("Proxy: Search failed", err.message);
+            }
+        }
+
+        // Updated system instruction with search results
+        const finalSystemInstruction = systemInstruction + searchContext;
 
         // Model fallback logic (Node side)
         const baseModels = [
@@ -64,7 +79,7 @@ router.post('/proxy', async (req, res) => {
                         { role: 'user', parts: userParts }
                     ],
                     config: {
-                        systemInstruction: { parts: [{ text: systemInstruction }] }
+                        systemInstruction: { parts: [{ text: finalSystemInstruction }] }
                     }
                 });
 

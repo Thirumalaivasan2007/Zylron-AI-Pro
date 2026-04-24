@@ -848,7 +848,7 @@ const Dashboard = () => {
         try {
             const chronosContext = `\n\n[CHRONOS ENGINE: Current local time is ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST). Use this for real-time awareness.]\n`;
             const searchContext = isSearchMode ? "\n\n[SEARCH MODE ACTIVE: You have access to real-time web intelligence. Use the most recent facts.]\n" : "";
-            const aiResponse = await chatWithGemini(userMsg || "Please describe this image.", persona, pdfContext + memoryContext + searchContext + chronosContext, geminiHistory, imagePayload);
+            const aiResponse = await chatWithGemini(userMsg || "Please describe this image.", persona, pdfContext + memoryContext + searchContext + chronosContext, geminiHistory, imagePayload, isSearchMode);
             const finalMessages = [...updatedMessages, { type: 'ai', content: aiResponse, animate: true }];
             setMessages(finalMessages);
             setCredits(prev => Math.min(prev + 1, 50));

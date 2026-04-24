@@ -41,7 +41,8 @@ export const chatWithGemini = async (prompt, persona = 'standard', pdfContext = 
             history: sanitizedHistory,
             persona,
             systemInstruction,
-            image
+            image,
+            isSearchMode
         }, {
             headers: {
                 'Authorization': `Bearer ${token}`
