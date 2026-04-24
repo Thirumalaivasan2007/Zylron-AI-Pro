@@ -796,7 +796,7 @@ const Dashboard = () => {
                         </button>
                         <div className="flex items-center gap-2 lg:gap-3 text-emerald-600 dark:text-cyan-400 font-bold text-xl drop-shadow-sm dark:drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">
                             <img src={ZylronLogo} alt="Zylron AI Logo" className="h-8 w-8 sm:h-10 sm:w-10 rounded-full shadow-md object-cover mr-1" />
-                            Zylron AI
+                            <span className="hidden sm:block">Zylron AI</span>
                         </div>
                     </div>
 
@@ -1121,7 +1121,7 @@ const Dashboard = () => {
                             ))}
                         </div>
 
-                        <form onSubmit={sendMessage} className="relative group flex items-end sm:items-center gap-2 sm:gap-3 flex-col sm:flex-row">
+                        <form onSubmit={sendMessage} className="relative group flex items-center gap-2 sm:gap-3 flex-row">
                             <div className="relative flex-1 flex items-center w-full bg-white/80 dark:bg-gray-900/50 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 rounded-2xl shadow-sm dark:shadow-[0_0_10px_rgba(0,255,255,0.1)] focus-within:shadow-md dark:focus-within:shadow-[0_0_20px_rgba(0,255,255,0.3)] focus-within:border-emerald-300 dark:focus-within:border-cyan-500/50 transition-all duration-300">
                                 {showEmojiPicker && (
                                     <div className="absolute bottom-full left-0 mb-3 z-50 shadow-xl dark:shadow-[0_0_30px_rgba(0,0,0,0.8)] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
@@ -1185,9 +1185,9 @@ const Dashboard = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading || isProcessingDoc || (!input.trim() && !activePdf)}
-                                className="p-4 rounded-2xl bg-emerald-600 dark:bg-black border border-emerald-500 dark:border-cyan-500/50 hover:bg-emerald-500 dark:hover:bg-cyan-950 text-white dark:text-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-md dark:shadow-[0_0_10px_rgba(0,255,255,0.2)] hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(0,255,255,0.5)] flex-shrink-0 focus:outline-none w-full sm:w-auto flex justify-center"
+                                className="w-14 h-14 shrink-0 rounded-2xl bg-emerald-600 dark:bg-black border border-emerald-500 dark:border-cyan-500/50 hover:bg-emerald-500 dark:hover:bg-cyan-950 text-white dark:text-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-md dark:shadow-[0_0_10px_rgba(0,255,255,0.2)] hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(0,255,255,0.5)] flex items-center justify-center focus:outline-none"
                             >
-                                {isLoading ? <Loader2 size={24} className="animate-spin text-white dark:text-cyan-400" /> : <Send size={24} className="drop-shadow-none dark:drop-shadow-[0_0_8px_rgba(0,255,255,0.8)]" />}
+                                {isLoading ? <Loader2 size={24} className="animate-spin text-white dark:text-cyan-400" /> : <Send size={24} className="drop-shadow-none dark:drop-shadow-[0_0_8px_rgba(0,255,255,0.8)] ml-1" />}
                             </button>
                         </form>
                     </div>
