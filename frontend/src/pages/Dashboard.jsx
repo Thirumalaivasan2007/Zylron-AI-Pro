@@ -846,8 +846,9 @@ const Dashboard = () => {
         }
 
         try {
+            const chronosContext = `\n\n[CHRONOS ENGINE: Current local time is ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST). Use this for real-time awareness.]\n`;
             const searchContext = isSearchMode ? "\n\n[SEARCH MODE ACTIVE: You have access to real-time web intelligence. Use the most recent facts.]\n" : "";
-            const aiResponse = await chatWithGemini(userMsg || "Please describe this image.", persona, pdfContext + memoryContext + searchContext, geminiHistory, imagePayload);
+            const aiResponse = await chatWithGemini(userMsg || "Please describe this image.", persona, pdfContext + memoryContext + searchContext + chronosContext, geminiHistory, imagePayload);
             const finalMessages = [...updatedMessages, { type: 'ai', content: aiResponse, animate: true }];
             setMessages(finalMessages);
             setCredits(prev => Math.min(prev + 1, 50));
@@ -996,11 +997,15 @@ const Dashboard = () => {
                         </button>
 
                         <button 
-                            onClick={() => setIsContinuousVoice(!isContinuousVoice)}
+                            onClick={() => {
+                                const newState = !isContinuousVoice;
+                                setIsContinuousVoice(newState);
+                                localStorage.continuousVoice = newState;
+                            }}
                             className={`p-2 rounded-full transition-all focus:outline-none ${isContinuousVoice ? 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600 dark:text-cyan-400 shadow-[0_0_20px_rgba(0,255,255,0.4)]' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`}
-                            title="Toggle Continuous Voice (Hands-Free)"
+                            title="Toggle Continuous Voice Mode"
                         >
-                            {isContinuousVoice ? <Mic size={20} className="animate-pulse" /> : <MicOff size={20} />}
+                            <Mic size={20} className={isContinuousVoice ? "animate-pulse" : ""} />
                         </button>
 
                         <button 
@@ -1132,13 +1137,28 @@ const Dashboard = () => {
                                                         {msg.imageUrl && (
                                                             <div className="relative group/img rounded-2xl overflow-hidden border border-gray-200 dark:border-cyan-500/30 shadow-2xl animate-in zoom-in-95 duration-500">
                                                                 <img src={msg.imageUrl} alt="AI Generated" className="w-full h-auto object-cover max-h-[500px]" />
-                                                                <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover/img:opacity-100">
+                                                                <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover/img:opacity-100 backdrop-blur-[2px]">
                                                                     <button 
-                                                                        type="button"
-                                                                        onClick={() => window.open(msg.imageUrl, '_blank')}
-                                                                        className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:scale-110 transition-all"
+                                                                        onClick={async () => {
+                                                                            try {
+                                                                                setFeedbackToast("Downloading Zylron Creation... 📥");
+                                                                                const res = await fetch(msg.imageUrl);
+                                                                                const blob = await res.blob();
+                                                                                const url = window.URL.createObjectURL(blob);
+                                                                                const link = document.createElement('a');
+                                                                                link.href = url;
+                                                                                link.download = `zylron-ai-${Date.now()}.jpg`;
+                                                                                link.click();
+                                                                                window.URL.revokeObjectURL(url);
+                                                                                setFeedbackToast("Download Complete! ✨");
+                                                                                setTimeout(() => setFeedbackToast(null), 3000);
+                                                                            } catch (e) {
+                                                                                window.open(msg.imageUrl, '_blank');
+                                                                            }
+                                                                        }}
+                                                                        className="p-4 bg-white/10 hover:bg-emerald-600 backdrop-blur-xl rounded-full text-white transition-all transform hover:scale-110 shadow-2xl border border-white/20"
                                                                     >
-                                                                        <Download size={24} />
+                                                                        <Download size={28} />
                                                                     </button>
                                                                 </div>
                                                             </div>
