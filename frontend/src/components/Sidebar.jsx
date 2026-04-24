@@ -1,7 +1,7 @@
-import { Plus, Trash2, MessageSquare, Zap, Search, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, MessageSquare, Zap, Search, RefreshCw, Share2, FileDown, HelpCircle, Download } from 'lucide-react';
 import { useState } from 'react';
 
-const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, deleteSession, credits = 0 }) => {
+const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, deleteSession, credits = 0, onShare, onExportPDF, onExportMD, onTour }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredHistory = history.filter(chat => 
@@ -29,6 +29,24 @@ const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, delete
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-gray-50 dark:bg-black/40 border border-gray-100 dark:border-gray-800 rounded-xl py-2 pl-10 pr-4 text-xs focus:outline-none focus:border-emerald-300 dark:focus:border-cyan-500/50 transition-all text-gray-700 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600"
                     />
+                </div>
+            </div>
+
+            {/* Mobile-Friendly Quick Actions */}
+            <div className="px-4 mb-4 sm:hidden">
+                <div className="grid grid-cols-2 gap-2">
+                    <button onClick={onShare} className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-white/5 rounded-xl text-[10px] font-bold text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-cyan-900/20 transition-all border border-gray-100 dark:border-gray-800">
+                        <Share2 size={12} /> Share
+                    </button>
+                    <button onClick={onExportPDF} className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-white/5 rounded-xl text-[10px] font-bold text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-cyan-900/20 transition-all border border-gray-100 dark:border-gray-800">
+                        <FileDown size={12} /> PDF
+                    </button>
+                    <button onClick={onExportMD} className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-white/5 rounded-xl text-[10px] font-bold text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-cyan-900/20 transition-all border border-gray-100 dark:border-gray-800">
+                        <Download size={12} /> MD
+                    </button>
+                    <button onClick={onTour} className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-white/5 rounded-xl text-[10px] font-bold text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-cyan-900/20 transition-all border border-gray-100 dark:border-gray-800">
+                        <HelpCircle size={12} /> Tour
+                    </button>
                 </div>
             </div>
 

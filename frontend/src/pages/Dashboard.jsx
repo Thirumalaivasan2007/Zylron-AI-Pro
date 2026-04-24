@@ -771,6 +771,10 @@ const Dashboard = () => {
                     currentSessionId={currentSessionId} 
                     deleteSession={deleteSession} 
                     credits={credits} 
+                    onShare={handleShareChat}
+                    onExportPDF={exportToPDF}
+                    onExportMD={exportToMarkdown}
+                    onTour={() => setIsTourActive(true)}
                 />
             </div>
 
