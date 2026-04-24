@@ -903,7 +903,7 @@ const Dashboard = () => {
             <div className={`flex-1 flex flex-col h-full relative transition-all duration-300 ${sidebarOpen ? 'lg:ml-72' : 'ml-0'}`}>
                 
                 {/* Top Nav Header - Gemini Style */}
-                <div className="sticky top-0 z-20 h-14 sm:h-16 w-full bg-white/80 dark:bg-black/50 backdrop-blur-xl border-b border-gray-200 dark:border-gray-900 flex items-center justify-between px-3 sm:px-6 transition-all duration-300">
+                <div className="sticky top-0 z-40 h-14 sm:h-16 w-full bg-white/80 dark:bg-black/50 backdrop-blur-xl border-b border-gray-200 dark:border-gray-900 flex items-center justify-between px-3 sm:px-6 transition-all duration-300">
                     <div className="flex items-center gap-2 sm:gap-4">
                         <button 
                             onClick={() => setSidebarOpen(!sidebarOpen)} 
