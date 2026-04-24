@@ -1,7 +1,7 @@
 import { Plus, Trash2, MessageSquare, Zap, Search, RefreshCw, Share2, FileDown, HelpCircle, Download } from 'lucide-react';
 import { useState } from 'react';
 
-const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, deleteSession, credits = 0, onShare, onExportPDF, onExportMD, onTour }) => {
+const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, deleteSession, credits = 0, onShare, onExportPDF, onExportMD, onTour, onAdmin }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredHistory = history.filter(chat => 
@@ -101,12 +101,15 @@ const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, delete
                     </div>
                     <span className="text-[10px] font-mono font-bold text-gray-600 dark:text-cyan-300">{credits} / 50</span>
                 </div>
-                <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-800/50 rounded-full overflow-hidden shadow-inner border border-gray-200/20 dark:border-cyan-900/10">
-                    <div 
-                        className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 dark:from-cyan-600 dark:to-blue-500 rounded-full shadow-[0_0_10px_rgba(0,255,255,0.3)] transition-all duration-1000"
-                        style={{ width: `${(credits / 50) * 100}%` }}
-                    ></div>
+                <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mb-3">
+                    <div className="h-full bg-emerald-500 dark:bg-cyan-500 shadow-[0_0_10px_rgba(0,255,255,0.4)] transition-all duration-500" style={{ width: `${(credits/50)*100}%` }}></div>
                 </div>
+                <button 
+                    onClick={onAdmin}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-white dark:bg-black/40 border border-gray-200 dark:border-cyan-800/50 rounded-xl text-[10px] font-bold text-gray-700 dark:text-cyan-400 hover:bg-cyan-500/10 transition-all uppercase tracking-widest"
+                >
+                    <RefreshCw size={12} className="animate-spin-slow" /> Admin Intelligence
+                </button>
                 <div className="mt-2.5">
                     <p className="text-[9px] text-gray-400 dark:text-gray-600 leading-relaxed text-center">
                         Need more? <span className="text-emerald-600 dark:text-cyan-400 cursor-pointer hover:underline">Upgrade to Pro</span>

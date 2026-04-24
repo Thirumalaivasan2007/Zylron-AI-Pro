@@ -900,6 +900,7 @@ const Dashboard = () => {
                     onExportPDF={exportToPDF}
                     onExportMD={exportToMarkdown}
                     onTour={() => setIsTourActive(true)}
+                    onAdmin={() => setIsAdminModalOpen(true)}
                 />
             </div>
 
