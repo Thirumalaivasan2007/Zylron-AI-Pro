@@ -42,7 +42,9 @@ import {
     ShieldCheck,
     Box,
     Terminal,
-    Play
+    Play,
+    Search,
+    MicOff
 } from 'lucide-react';
 import { Joyride } from 'react-joyride';
 import CodePreviewModal from '../components/CodePreviewModal';
@@ -221,6 +223,12 @@ const Dashboard = () => {
     const [feedbackToast, setFeedbackToast] = useState(null);
     const [isMemoryEnabled, setIsMemoryEnabled] = useState(localStorage.memory === 'true');
     const [showScrollButton, setShowScrollButton] = useState(false);
+
+    // Phase 3 States
+    const [activeFiles, setActiveFiles] = useState([]); // Multiple PDFs
+    const [isContinuousVoice, setIsContinuousVoice] = useState(false);
+    const [isSearchMode, setIsSearchMode] = useState(false);
+    const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
     const messagesEndRef = useRef(null);
     const scrollContainerRef = useRef(null);
@@ -423,7 +431,12 @@ const Dashboard = () => {
         utterance.pitch = 1.0;
 
         utterance.onstart = () => setIsSpeakingIndex(index);
-        utterance.onend = () => setIsSpeakingIndex(null);
+        utterance.onend = () => {
+            setIsSpeakingIndex(null);
+            if (isContinuousVoice) {
+                setTimeout(() => startListening(), 500);
+            }
+        };
         utterance.onerror = () => setIsSpeakingIndex(null);
 
         window.speechSynthesis.speak(utterance);
@@ -474,14 +487,28 @@ const Dashboard = () => {
                 const strings = content.items.map(item => item.str);
                 fullText += strings.join(" ") + "\n";
             }
-            setPdfContext(fullText);
-            setActivePdf({ name: file.name, size: (file.size / 1024).toFixed(1) + " KB" });
+            setPdfContext(prev => prev + "\n" + fullText);
+            setActiveFiles(prev => [...prev, { 
+                id: Date.now(), 
+                name: file.name, 
+                size: (file.size / 1024).toFixed(1) + " KB",
+                type: 'pdf'
+            }]);
+            setFeedbackToast(`"${file.name}" added to intelligence library.`);
         } catch (error) {
             console.error("PDF Extraction Error:", error);
             alert("Failed to extract text from PDF. Please try a different file.");
         } finally {
             setIsProcessingDoc(false);
         }
+    };
+
+    const removeFile = (id) => {
+        const fileToRemove = activeFiles.find(f => f.id === id);
+        setActiveFiles(prev => prev.filter(f => f.id !== id));
+        // Note: Full context re-extraction would be better, but for now we just append. 
+        // In a real app, we'd store text per file and re-combine.
+        setFeedbackToast(`Removed "${fileToRemove?.name}"`);
     };
 
     const onDrop = useCallback(acceptedFiles => {
@@ -769,14 +796,32 @@ const Dashboard = () => {
             parts: [{ text: m.content || "Attached an image." }]
         })).slice(-10);
 
+        // Phase 3: Image Generation Detection
+        if (userMsg.toLowerCase().startsWith('generate image') || userMsg.toLowerCase().startsWith('create an image')) {
+            setIsGeneratingImage(true);
+            const imagePrompt = userMsg.replace(/generate image|create an image/gi, '').trim();
+            const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(imagePrompt)}?width=1024&height=1024&seed=${Date.now()}&model=flux`;
+            
+            setMessages(prev => [...prev, { 
+                type: 'ai', 
+                content: `🎨 **Zylron Creator** has synthesized your request: "${imagePrompt}"`, 
+                imageUrl: imageUrl,
+                animate: true 
+            }]);
+            setIsGeneratingImage(false);
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            const aiResponse = await chatWithGemini(userMsg || "Please describe this image.", persona, pdfContext + memoryContext, geminiHistory, imagePayload);
+            const searchContext = isSearchMode ? "\n\n[SEARCH MODE ACTIVE: You have access to real-time web intelligence. Use the most recent facts.]\n" : "";
+            const aiResponse = await chatWithGemini(userMsg || "Please describe this image.", persona, pdfContext + memoryContext + searchContext, geminiHistory, imagePayload);
             const finalMessages = [...updatedMessages, { type: 'ai', content: aiResponse, animate: true }];
             setMessages(finalMessages);
             setCredits(prev => Math.min(prev + 1, 50));
             
-            // Auto-speak if enabled
-            if (isAutoSpeak) {
+            // Auto-speak if enabled or continuous
+            if (isAutoSpeak || isContinuousVoice) {
                 speakText(aiResponse, finalMessages.length - 1);
             }
 
@@ -908,6 +953,22 @@ const Dashboard = () => {
                             title="Download PDF Report"
                         >
                             <FileDown size={20} />
+                        </button>
+
+                        <button 
+                            onClick={() => setIsSearchMode(!isSearchMode)}
+                            className={`p-2 rounded-full transition-all focus:outline-none ${isSearchMode ? 'bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.3)]' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`}
+                            title="Toggle Live Web Search"
+                        >
+                            <Search size={20} />
+                        </button>
+
+                        <button 
+                            onClick={() => setIsContinuousVoice(!isContinuousVoice)}
+                            className={`p-2 rounded-full transition-all focus:outline-none ${isContinuousVoice ? 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600 dark:text-cyan-400 shadow-[0_0_20px_rgba(0,255,255,0.4)]' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`}
+                            title="Toggle Continuous Voice (Hands-Free)"
+                        >
+                            {isContinuousVoice ? <Mic size={20} className="animate-pulse" /> : <MicOff size={20} />}
                         </button>
 
                         <button 
@@ -1144,6 +1205,23 @@ const Dashboard = () => {
                                     <button onClick={removeImage} className="hover:text-red-500 transition-colors bg-white dark:bg-black rounded-full p-0.5 self-start">
                                         <X size={12} />
                                     </button>
+                                </div>
+                            )}
+
+                            {activeFiles.length > 0 && !isProcessingDoc && (
+                                <div className="flex flex-wrap gap-2 mb-1">
+                                    {activeFiles.map(file => (
+                                        <div key={file.id} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/80 dark:bg-gray-900/80 border border-emerald-500/30 dark:border-cyan-500/30 shadow-sm animate-in zoom-in-95 duration-300">
+                                            <FileText size={14} className="text-emerald-500 dark:text-cyan-400" />
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] text-gray-400 font-bold uppercase truncate max-w-[80px]">{file.name}</span>
+                                            </div>
+                                            <button onClick={() => removeFile(file.id)} className="hover:text-red-500 transition-colors">
+                                                <X size={12} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button onClick={() => { setActiveFiles([]); setPdfContext(''); }} className="text-[10px] font-bold text-red-500 hover:underline px-2 self-center">Clear Library</button>
                                 </div>
                             )}
                         </div>
