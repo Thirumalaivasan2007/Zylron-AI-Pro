@@ -310,28 +310,37 @@ const Dashboard = () => {
 
     const handleShareChat = async () => {
         if (messages.length === 0) return;
-        setIsLoading(true);
-        const publicId = await createPublicShare(messages, persona);
-        setIsLoading(false);
-        if (publicId) {
-            const url = `${window.location.origin}/share/${publicId}`;
+        
+        try {
+            setFeedbackToast("Preparing secure share link... 🛡️");
+            const publicId = await createPublicShare(messages, persona);
             
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'Zylron AI Chat',
-                        text: 'Check out my conversation with Zylron AI!',
-                        url: url
-                    });
-                    setFeedbackToast("Shared successfully! ✨");
-                } catch (err) {
-                    navigator.clipboard.writeText(url);
+            if (publicId) {
+                const url = `${window.location.origin}/share/${publicId}`;
+                
+                // Native Mobile Share
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'Zylron AI Chat',
+                            text: 'Check out my conversation with Zylron AI!',
+                            url: url
+                        });
+                        setFeedbackToast("Shared successfully! ✨");
+                    } catch (err) {
+                        // Fallback to clipboard if user cancels or it fails
+                        await navigator.clipboard.writeText(url);
+                        setFeedbackToast("Share link copied to clipboard! 🔗");
+                    }
+                } else {
+                    // Standard Clipboard Fallback
+                    await navigator.clipboard.writeText(url);
                     setFeedbackToast("Share link copied to clipboard! 🔗");
                 }
-            } else {
-                navigator.clipboard.writeText(url);
-                setFeedbackToast("Share link copied to clipboard! 🔗");
             }
+        } catch (error) {
+            console.error("Share Error:", error);
+            setFeedbackToast("Sharing failed. Please try again. 🛠️");
         }
     };
 
@@ -949,7 +958,7 @@ const Dashboard = () => {
                         <button 
                             onClick={handleShareChat}
                             disabled={messages.length === 0}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed hidden sm:flex"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed flex"
                             title="Share Conversation"
                         >
                             <Share2 size={20} />
@@ -958,7 +967,7 @@ const Dashboard = () => {
                         <button 
                             onClick={exportToPDF}
                             disabled={messages.length === 0}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed hidden sm:flex"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed flex"
                             title="Download PDF Report"
                         >
                             <FileDown size={20} />
@@ -1379,7 +1388,7 @@ const Dashboard = () => {
             {showScrollButton && (
                 <button
                     onClick={scrollToBottom}
-                    className="fixed bottom-32 right-6 z-30 p-3 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-emerald-500/30 dark:border-cyan-500/30 text-emerald-600 dark:text-cyan-400 shadow-xl hover:scale-110 transition-all animate-bounce"
+                    className="fixed bottom-24 right-4 sm:bottom-32 sm:right-6 z-30 p-3.5 rounded-full bg-emerald-600 dark:bg-cyan-600 text-white shadow-2xl hover:scale-110 active:scale-95 transition-all animate-bounce border-2 border-white/20"
                 >
                     <ChevronDown size={24} className="animate-pulse" />
                 </button>
