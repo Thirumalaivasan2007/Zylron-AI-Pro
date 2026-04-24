@@ -18,7 +18,7 @@ const PERSONAS = {
  * Modern chat with Gemini AI via Secure Backend Proxy.
  * Solves CORS, Browser Discovery, and Environment issues once and for all.
  */
-export const chatWithGemini = async (prompt, persona = 'standard', pdfContext = '', history = [], image = null) => {
+export const chatWithGemini = async (prompt, persona = 'standard', pdfContext = '', history = [], image = null, isSearchMode = false) => {
     try {
         console.log("Zylron Engine: Routing request through Secure Backend Proxy...");
 
