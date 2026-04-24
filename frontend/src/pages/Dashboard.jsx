@@ -36,6 +36,9 @@ import {
     ThumbsDown,
     FileDown,
     Share2,
+    Activity,
+    MessageSquare,
+    Layout,
     HelpCircle,
     GraduationCap,
     Briefcase,
@@ -46,6 +49,7 @@ import {
     Search,
     MicOff
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Joyride } from 'react-joyride';
 import CodePreviewModal from '../components/CodePreviewModal';
 import { jsPDF } from "jspdf";
