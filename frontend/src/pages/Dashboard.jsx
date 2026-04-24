@@ -998,6 +998,9 @@ const Dashboard = () => {
 
                         <button 
                             onClick={() => {
+                                if (isContinuousVoice) {
+                                    if (window.speechSynthesis) window.speechSynthesis.cancel();
+                                }
                                 const newState = !isContinuousVoice;
                                 setIsContinuousVoice(newState);
                                 localStorage.continuousVoice = newState;
@@ -1140,21 +1143,27 @@ const Dashboard = () => {
                                                                 <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover/img:opacity-100 backdrop-blur-[2px]">
                                                                     <button 
                                                                         onClick={async () => {
-                                                                            try {
-                                                                                setFeedbackToast("Downloading Zylron Creation... 📥");
-                                                                                const res = await fetch(msg.imageUrl);
-                                                                                const blob = await res.blob();
-                                                                                const url = window.URL.createObjectURL(blob);
-                                                                                const link = document.createElement('a');
-                                                                                link.href = url;
-                                                                                link.download = `zylron-ai-${Date.now()}.jpg`;
-                                                                                link.click();
-                                                                                window.URL.revokeObjectURL(url);
-                                                                                setFeedbackToast("Download Complete! ✨");
+                                                                            const downloadPromise = async () => {
+                                                                                try {
+                                                                                    setFeedbackToast("Downloading Zylron Creation... 📥");
+                                                                                    const res = await fetch(msg.imageUrl);
+                                                                                    if (!res.ok) throw new Error("CORS or Network Error");
+                                                                                    const blob = await res.blob();
+                                                                                    const url = window.URL.createObjectURL(blob);
+                                                                                    const link = document.createElement('a');
+                                                                                    link.href = url;
+                                                                                    link.download = `zylron-ai-${Date.now()}.jpg`;
+                                                                                    link.click();
+                                                                                    window.URL.revokeObjectURL(url);
+                                                                                    setFeedbackToast("Download Complete! ✨");
+                                                                                } catch (e) {
+                                                                                    console.warn("Direct download failed, falling back to new tab...");
+                                                                                    window.open(msg.imageUrl, '_blank');
+                                                                                    setFeedbackToast("Opening in new tab for manual save... 🚀");
+                                                                                }
                                                                                 setTimeout(() => setFeedbackToast(null), 3000);
-                                                                            } catch (e) {
-                                                                                window.open(msg.imageUrl, '_blank');
-                                                                            }
+                                                                            };
+                                                                            downloadPromise();
                                                                         }}
                                                                         className="p-4 bg-white/10 hover:bg-emerald-600 backdrop-blur-xl rounded-full text-white transition-all transform hover:scale-110 shadow-2xl border border-white/20"
                                                                     >
