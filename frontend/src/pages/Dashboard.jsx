@@ -1031,6 +1031,20 @@ const Dashboard = () => {
                             <HelpCircle size={20} />
                         </button>
 
+                        {/* Separate Credits and Admin Trigger */}
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-900 rounded-full border border-gray-200 dark:border-gray-800 credits-tracker shadow-inner">
+                            <Zap size={14} className="text-emerald-600 dark:text-cyan-400" />
+                            <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{credits}</span>
+                        </div>
+
+                        <button 
+                            onClick={() => setIsAdminModalOpen(true)}
+                            className="p-2 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 transition-all border border-cyan-500/20 shadow-lg shadow-cyan-500/5 group"
+                            title="Admin Diagnostics"
+                        >
+                            <Activity size={18} className="group-hover:scale-110 transition-transform" />
+                        </button>
+
                         <button 
                             onClick={() => setIsSettingsModalOpen(true)}
                             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none hidden sm:flex"
