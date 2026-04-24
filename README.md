@@ -91,3 +91,7 @@ The compiled files will be outputted to the `/dist` directory, fully ready to be
 <div align="center">
   <i>Built with passion by a Senior Full-Stack Developer.</i>
 </div>
+
+<div align="center">
+  <i>Created By Thirumalaivasan</i>
+</div>
