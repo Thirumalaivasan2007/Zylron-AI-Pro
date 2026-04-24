@@ -903,17 +903,17 @@ const Dashboard = () => {
             <div className={`flex-1 flex flex-col h-full relative transition-all duration-300 ${sidebarOpen ? 'lg:ml-72' : 'ml-0'}`}>
                 
                 {/* Top Nav Header - Gemini Style */}
-                <div className="sticky top-0 z-20 h-16 w-full bg-white/80 dark:bg-black/50 backdrop-blur-xl border-b border-gray-200 dark:border-gray-900 flex items-center justify-between px-4 sm:px-6 transition-all duration-300">
-                    <div className="flex items-center gap-4">
+                <div className="sticky top-0 z-20 h-14 sm:h-16 w-full bg-white/80 dark:bg-black/50 backdrop-blur-xl border-b border-gray-200 dark:border-gray-900 flex items-center justify-between px-3 sm:px-6 transition-all duration-300">
+                    <div className="flex items-center gap-2 sm:gap-4">
                         <button 
                             onClick={() => setSidebarOpen(!sidebarOpen)} 
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-600 dark:text-gray-300 transition-all focus:outline-none sidebar-trigger"
+                            className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-600 dark:text-gray-300 transition-all focus:outline-none sidebar-trigger"
                         >
-                            <Menu size={24} />
+                            <Menu size={22} />
                         </button>
-                        <div className="flex items-center gap-2 lg:gap-3 text-emerald-600 dark:text-cyan-400 font-bold text-xl drop-shadow-sm dark:drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">
-                            <img src={ZylronLogo} alt="Zylron AI Logo" className="h-8 w-8 sm:h-10 sm:w-10 rounded-full shadow-md object-cover mr-1" />
-                            <span className="hidden sm:block">Zylron AI</span>
+                        <div className="flex items-center gap-2 lg:gap-3 text-emerald-600 dark:text-cyan-400 font-bold text-base sm:text-xl drop-shadow-sm dark:drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">
+                            <img src={ZylronLogo} alt="Zylron AI Logo" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full shadow-md object-cover mr-1" />
+                            <span className="hidden sm:block text-sm sm:text-lg">Zylron AI</span>
                         </div>
                     </div>
 
@@ -1199,8 +1199,8 @@ const Dashboard = () => {
                 </div>
 
                 {/* Glassmorphism Input Area */}
-                <div className="p-2 sm:p-4 bg-transparent relative z-10 w-full mb-2">
-                    <div className="max-w-4xl mx-auto flex flex-col gap-3">
+                <div className="p-2 sm:p-4 bg-transparent relative z-10 w-full mb-1 sm:mb-2">
+                    <div className="max-w-4xl mx-auto flex flex-col gap-2 sm:gap-3">
                         
                         {/* Status / Active File Banners */}
                         <div className="flex flex-wrap gap-2 px-1">
@@ -1335,7 +1335,7 @@ const Dashboard = () => {
                             </button>
                         </form>
                     </div>
-                    <p className="text-center text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-600 mt-4 font-bold opacity-60">Zylron AI may display inaccurate info, so double-check its responses.</p>
+                    <p className="text-center text-[9px] uppercase tracking-widest text-gray-500 dark:text-gray-600 mt-2 sm:mt-4 font-bold opacity-60 px-4 leading-relaxed">Zylron AI may display inaccurate info, so double-check its responses.</p>
                 </div>
             </div>
 
