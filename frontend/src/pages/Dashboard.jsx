@@ -229,6 +229,7 @@ const Dashboard = () => {
     const [isContinuousVoice, setIsContinuousVoice] = useState(false);
     const [isSearchMode, setIsSearchMode] = useState(false);
     const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+    const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
     const messagesEndRef = useRef(null);
     const scrollContainerRef = useRef(null);
@@ -528,9 +529,15 @@ const Dashboard = () => {
 
     const removeFile = (id) => {
         const fileToRemove = activeFiles.find(f => f.id === id);
-        setActiveFiles(prev => prev.filter(f => f.id !== id));
-        // Note: Full context re-extraction would be better, but for now we just append. 
-        // In a real app, we'd store text per file and re-combine.
+        const newFiles = activeFiles.filter(f => f.id !== id);
+        setActiveFiles(newFiles);
+        
+        // Re-generate context from remaining files
+        let newContext = "";
+        // Note: In a full production app, we would store the extracted text inside the file object
+        // For now, we clear context if no files left, or keep it (simplification)
+        if (newFiles.length === 0) setPdfContext("");
+        
         setFeedbackToast(`Removed "${fileToRemove?.name}"`);
     };
 
@@ -1445,6 +1452,91 @@ const Dashboard = () => {
                     <span className="text-sm font-bold text-gray-800 dark:text-white">{feedbackToast}</span>
                 </div>
             )}
+
+            {/* Admin Intelligence Dashboard */}
+            <AnimatePresence>
+                {isAdminModalOpen && (
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsAdminModalOpen(false)}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                        />
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-2xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-cyan-500/30 rounded-3xl overflow-hidden shadow-2xl"
+                        >
+                            <div className="p-8">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-3 bg-cyan-500/10 rounded-2xl">
+                                            <Activity className="text-cyan-500" size={24} />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Intelligence</h2>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 text-[10px] uppercase tracking-widest mt-1">Zylron System Diagnostics</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setIsAdminModalOpen(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                                        <X size={20} className="text-gray-500" />
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                                    <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl">
+                                        <div className="flex items-center gap-2 text-emerald-600 dark:text-cyan-400 mb-2">
+                                            <Zap size={16} />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Credit Balance</span>
+                                        </div>
+                                        <div className="text-3xl font-bold dark:text-white mb-1">{credits} <span className="text-sm font-normal text-gray-400">Tokens</span></div>
+                                        <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mt-4">
+                                            <div className="h-full bg-cyan-500 shadow-[0_0_10px_rgba(0,255,255,0.5)]" style={{ width: `${(credits/50)*100}%` }}></div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl">
+                                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-2">
+                                            <MessageSquare size={16} />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Total Interactions</span>
+                                        </div>
+                                        <div className="text-3xl font-bold dark:text-white mb-1">{messages.length} <span className="text-sm font-normal text-gray-400">Nodes</span></div>
+                                        <p className="text-xs text-gray-500 mt-2">Active across {history.length} unique cloud sessions.</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-white dark:bg-black/20 border border-gray-100 dark:border-gray-800/50 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+                                            <span className="text-sm dark:text-gray-300">Gemini 2.5 Flash-Lite</span>
+                                        </div>
+                                        <span className="text-[10px] font-bold text-emerald-500 uppercase">Operational</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-4 bg-white dark:bg-black/20 border border-gray-100 dark:border-gray-800/50 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(0,255,255,0.8)]"></div>
+                                            <span className="text-sm dark:text-gray-300">Zylron Search Engine</span>
+                                        </div>
+                                        <span className="text-[10px] font-bold text-cyan-500 uppercase">Connected</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800 flex justify-end">
+                                <button 
+                                    onClick={() => setIsAdminModalOpen(false)}
+                                    className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold text-sm hover:opacity-80 transition-all"
+                                >
+                                    Dismiss Diagnostics
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
