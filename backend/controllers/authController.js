@@ -51,6 +51,10 @@ const registerUser = async (req, res) => {
     }
 };
 
+const { sendLoginNotification } = require('../utils/emailService');
+
+// ... (other functions)
+
 // @desc    Authenticate a user
 // @route   POST /api/auth/login
 // @access  Public
@@ -58,10 +62,12 @@ const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Check for user email
         const user = await User.findOne({ email });
 
         if (user && (await user.matchPassword(password))) {
+            // Trigger Notification
+            sendLoginNotification({ name: user.name, email: user.email });
+
             res.json({
                 _id: user.id,
                 name: user.name,
@@ -77,7 +83,23 @@ const loginUser = async (req, res) => {
     }
 };
 
+// @desc    Notify admin of a Firebase/Social login
+// @route   POST /api/auth/notify-login
+// @access  Public
+const notifyLogin = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        if (!email) return res.status(400).json({ message: 'Email required' });
+
+        await sendLoginNotification({ name, email });
+        res.status(200).json({ success: true });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
+    notifyLogin,
 };

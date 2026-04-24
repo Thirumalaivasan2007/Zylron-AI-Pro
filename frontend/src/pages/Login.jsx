@@ -15,6 +15,7 @@ import {
 import ZylronLogo from '../logo.png';
 import { auth } from '../config/firebase';
 import { isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
+import { authAPI } from '../services/api';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -33,8 +34,13 @@ const Login = () => {
             
             setIsLoading(true);
             signInWithEmailLink(auth, emailForSignIn, window.location.href)
-                .then(() => {
+                .then(async (result) => {
                     window.localStorage.removeItem('emailForSignIn');
+                    // Notify Admin
+                    await authAPI.notifyLogin({ 
+                        name: result.user.displayName, 
+                        email: result.user.email 
+                    }).catch(err => console.error("Notification failed:", err));
                     navigate('/');
                 })
                 .catch((error) => {
@@ -53,6 +59,11 @@ const Login = () => {
         else if (provider === 'facebook') result = await loginWithFacebook();
         
         if (result?.success) {
+            // Notify Admin
+            await authAPI.notifyLogin({ 
+                name: auth.currentUser?.displayName, 
+                email: auth.currentUser?.email 
+            }).catch(err => console.error("Notification failed:", err));
             navigate('/');
         } else {
             setMsg({ type: 'error', text: result?.message || 'Authentication failed' });

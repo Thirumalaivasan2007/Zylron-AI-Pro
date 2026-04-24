@@ -22,4 +22,8 @@ api.interceptors.request.use(
     }
 );
 
+export const authAPI = {
+    notifyLogin: (userData) => api.post('/auth/notify-login', userData)
+};
+
 export default api;
