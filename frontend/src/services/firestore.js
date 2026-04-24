@@ -103,6 +103,22 @@ export const createPublicShare = async (messages, persona) => {
     }
 };
 
+// Instant Share Background Sync
+export const createPublicShareWithId = async (publicId, messages, persona) => {
+    try {
+        const shareRef = doc(db, 'public_shares', publicId);
+        await setDoc(shareRef, {
+            messages,
+            persona,
+            createdAt: serverTimestamp()
+        });
+        return publicId;
+    } catch (error) {
+        console.error("Error in background share sync:", error);
+        return null;
+    }
+};
+
 export const fetchPublicChat = async (publicId) => {
     try {
         const shareRef = doc(db, 'public_shares', publicId);

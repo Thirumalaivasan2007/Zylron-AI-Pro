@@ -64,7 +64,7 @@ import ZylronLogo from '../logo.png';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import EmojiPicker from 'emoji-picker-react';
-import { saveChatToCloud, fetchCloudChats, deleteCloudChat, saveFeedbackToCloud, createPublicShare } from '../services/firestore';
+import { saveChatToCloud, fetchCloudChats, deleteCloudChat, saveFeedbackToCloud, createPublicShare, createPublicShareWithId } from '../services/firestore';
 import ZylronSense from '../components/ZylronSense';
 
 // Configure PDF.js Worker
@@ -311,36 +311,45 @@ const Dashboard = () => {
     const handleShareChat = async () => {
         if (messages.length === 0) return;
         
+        // 1. Instant Local ID Generation
+        const publicId = Math.random().toString(36).substring(2, 12);
+        const url = `${window.location.origin}/share/${publicId}`;
+
         try {
-            setFeedbackToast("Preparing secure share link... 🛡️");
-            const publicId = await createPublicShare(messages, persona);
-            
-            if (publicId) {
-                const url = `${window.location.origin}/share/${publicId}`;
-                
-                // Native Mobile Share
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'Zylron AI Chat',
-                            text: 'Check out my conversation with Zylron AI!',
-                            url: url
-                        });
-                        setFeedbackToast("Shared successfully! ✨");
-                    } catch (err) {
-                        // Fallback to clipboard if user cancels or it fails
-                        await navigator.clipboard.writeText(url);
-                        setFeedbackToast("Share link copied to clipboard! 🔗");
-                    }
-                } else {
-                    // Standard Clipboard Fallback
+            // 2. Instant Feedback & Clipboard Copy (No Waiting)
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Zylron AI Chat',
+                        text: 'Check out my conversation with Zylron AI!',
+                        url: url
+                    });
+                    setFeedbackToast("Shared successfully! ✨");
+                } catch (err) {
                     await navigator.clipboard.writeText(url);
                     setFeedbackToast("Share link copied to clipboard! 🔗");
                 }
+            } else {
+                await navigator.clipboard.writeText(url);
+                setFeedbackToast("Share link copied to clipboard! 🔗");
             }
+
+            // 3. Background Sync (Firestore upload happens silently)
+            const trimmedMessages = messages.map(m => ({
+                type: m.type,
+                content: m.content,
+                imageUrl: m.imageUrl || null,
+                isSystem: m.isSystem || false
+            }));
+            
+            // This happens in the background, we don't 'await' it to keep UI fast
+            createPublicShareWithId(publicId, trimmedMessages, persona);
+
         } catch (error) {
             console.error("Share Error:", error);
-            setFeedbackToast("Sharing failed. Please try again. 🛠️");
+            // Final fallback
+            navigator.clipboard.writeText(url);
+            setFeedbackToast("Link copied to clipboard! 🔗");
         }
     };
 
