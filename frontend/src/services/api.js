@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.MODE === 'development' 
     ? 'http://localhost:5000/api' 
-    : 'https://zylron-backend.onrender.com/api';
+    : 'https://zylron-ai-pro.onrender.com/api';
 
 const api = axios.create({
     baseURL: API_BASE_URL,

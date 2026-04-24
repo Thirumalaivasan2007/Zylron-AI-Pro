@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware - Explicitly allow Vercel and all origins for development
 const allowedOrigins = [
-    'https://zylron-ai-web.vercel.app',
+    'https://zylron-ai-pro.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000'
 ];
