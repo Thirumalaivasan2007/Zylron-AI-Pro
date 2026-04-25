@@ -1200,30 +1200,30 @@ const Dashboard = () => {
                         >
                             <Menu size={22} />
                         </button>
-                        <div className="flex items-center gap-3 text-emerald-600 dark:text-cyan-400 font-bold drop-shadow-sm">
+                        <div className="flex items-center gap-2 text-emerald-600 dark:text-cyan-400 font-bold drop-shadow-sm">
                             <div className="relative group cursor-pointer shrink-0">
-                                {/* Neural Orbit Ring */}
-                                <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-500 via-cyan-500 to-purple-500 rounded-full blur-md opacity-30 group-hover:opacity-100 group-hover:blur-lg transition-all duration-700 animate-spin-slow"></div>
+                                {/* Circular Neural Glow */}
+                                <div className="absolute -inset-1 bg-gradient-to-tr from-emerald-500/40 via-cyan-500/40 to-purple-500/40 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                 
-                                {/* Logo Container */}
-                                <div className="relative h-9 w-auto min-w-[2.25rem] sm:h-11 flex items-center justify-center transition-all duration-300">
+                                {/* Circular Logo Container */}
+                                <div className="relative h-8 w-8 sm:h-9 sm:w-9 bg-black/50 rounded-full flex items-center justify-center border border-white/10 shadow-lg overflow-hidden ring-1 ring-cyan-500/20">
                                     <img 
                                         src="/logo.png" 
-                                        alt="Zylron AI" 
-                                        className="h-full w-auto object-contain transition-transform duration-700 group-hover:scale-110 drop-shadow-[0_0_12px_rgba(0,255,255,0.4)]" 
+                                        alt="Zylron" 
+                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
                                     />
                                 </div>
 
                                 {/* Active Status Dot */}
-                                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 dark:bg-cyan-400 rounded-full border-2 border-white dark:border-black shadow-[0_0_10px_rgba(0,255,255,0.8)] z-10"></div>
+                                <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-500 dark:bg-cyan-400 rounded-full border border-white dark:border-black shadow-[0_0_8px_rgba(0,255,255,0.8)] z-10"></div>
                             </div>
                             
-                            <div className="flex flex-col">
-                                <span className="text-sm sm:text-xl font-black tracking-tighter bg-gradient-to-r from-emerald-500 via-cyan-400 to-blue-500 bg-clip-text text-transparent leading-none">
+                            <div className="flex flex-col ml-1">
+                                <span className="text-sm sm:text-lg font-black tracking-tighter bg-gradient-to-r from-emerald-500 via-cyan-400 to-blue-500 bg-clip-text text-transparent leading-none">
                                     Zylron AI
                                 </span>
-                                <span className="text-[7px] sm:text-[8px] uppercase tracking-[0.2em] sm:tracking-[0.3em] font-black text-gray-400 dark:text-cyan-500/50 mt-0.5 whitespace-nowrap">
-                                    Neural Operating System
+                                <span className="text-[6px] sm:text-[7px] uppercase tracking-[0.2em] font-bold text-gray-500 dark:text-cyan-500/40 mt-0.5">
+                                    Neural AI OS
                                 </span>
                             </div>
                         </div>
@@ -1474,12 +1474,14 @@ const Dashboard = () => {
                         <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 animate-fade-in overflow-y-auto">
                             {/* Logo + Title */}
                             <div className="flex flex-col items-center mb-6 md:mb-8">
-                                <div className="relative mb-8 flex items-center justify-center">
-                                    <div className="relative h-24 md:h-32 w-auto min-w-[6rem] animate-neural-pulse flex items-center justify-center p-4">
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 via-cyan-500/20 to-purple-500/20 blur-2xl rounded-full"></div>
-                                        <img src="/logo.png" alt="Zylron AI" className="relative h-full w-auto object-contain drop-shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-transform duration-700 hover:scale-105" />
+                                <div className="relative mb-8 flex items-center justify-center group">
+                                    <div className="relative h-28 w-28 md:h-36 md:w-36 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl transition-all duration-700 hover:scale-105 ring-4 ring-cyan-500/20">
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 via-cyan-500/20 to-purple-500/20 blur-xl"></div>
+                                        <img src="/logo.png" alt="Zylron AI" className="relative h-full w-full object-cover" />
                                     </div>
-                                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-emerald-500 dark:bg-cyan-400 rounded-full border-4 border-white dark:border-black shadow-[0_0_15px_rgba(0,255,255,0.8)] animate-pulse z-10" />
+                                    {/* Orbital Glow */}
+                                    <div className="absolute inset-0 bg-cyan-500/10 blur-3xl rounded-full -z-10 group-hover:bg-cyan-500/20 transition-all duration-700"></div>
+                                    <div className="absolute -top-1 -right-1 w-7 h-7 bg-emerald-500 dark:bg-cyan-400 rounded-full border-4 border-white dark:border-black shadow-[0_0_20px_rgba(0,255,255,0.6)] animate-pulse z-10" />
                                 </div>
                                 <h1 className="text-3xl md:text-5xl font-bold text-center mb-2">
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 dark:from-cyan-400 dark:via-blue-400 dark:to-emerald-400">
