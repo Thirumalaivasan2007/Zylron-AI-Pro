@@ -1345,7 +1345,7 @@ const Dashboard = () => {
 
                         <button 
                             onClick={() => setIsAdminModalOpen(true)}
-                            className="p-2 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 transition-all border border-cyan-500/20 shadow-lg shadow-cyan-500/5 group hidden xl:flex"
+                            className="p-2 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 transition-all border border-cyan-500/20 shadow-lg shadow-cyan-500/5 group hidden 2xl:flex"
                             title="Admin Diagnostics"
                         >
                             <Activity size={18} className="group-hover:scale-110 transition-transform" />
@@ -1353,7 +1353,7 @@ const Dashboard = () => {
 
                         <button 
                             onClick={() => setIsSettingsModalOpen(true)}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none hidden lg:flex"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none hidden xl:flex"
                             title="Open Settings"
                         >
                             <Settings size={20} />
@@ -1362,7 +1362,7 @@ const Dashboard = () => {
                         <button 
                             onClick={exportToMarkdown}
                             disabled={messages.length === 0}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed hidden md:flex"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed hidden 2xl:flex"
                             title="Export to Markdown"
                         >
                             <Download size={20} />
@@ -1471,7 +1471,7 @@ const Dashboard = () => {
 
                     {messages.length === 0 ? (
                         /* Premium Welcome State — 15 Features Showcase */
-                        <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 animate-fade-in overflow-y-auto">
+                        <div className="h-full flex flex-col items-center justify-start p-4 md:p-8 pt-10 md:pt-16 animate-fade-in overflow-y-auto custom-scrollbar">
                             {/* Logo + Title */}
                             <div className="flex flex-col items-center mb-6 md:mb-8">
                                 <div className="relative mb-8 group">
