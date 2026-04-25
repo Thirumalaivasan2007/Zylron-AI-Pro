@@ -47,11 +47,26 @@ import {
     Terminal,
     Play,
     Search,
-    MicOff
+    MicOff,
+    Plus,
+    Globe,
+    Brain,
+    Wand2,
+    FolderOpen,
+    Video,
+    Maximize2,
+    Minimize2,
+    Pin,
+    PinOff,
+    BarChart3,
+    Cpu,
+    BellRing,
+    SearchCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Joyride } from 'react-joyride';
 import CodePreviewModal from '../components/CodePreviewModal';
+import CustomPersonaModal from '../components/CustomPersonaModal';
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -70,9 +85,52 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import EmojiPicker from 'emoji-picker-react';
 import { saveChatToCloud, fetchCloudChats, deleteCloudChat, saveFeedbackToCloud, createPublicShare, createPublicShareWithId } from '../services/firestore';
 import ZylronSense from '../components/ZylronSense';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 // Configure PDF.js Worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+const DataChart = ({ data }) => {
+    return (
+        <div className="w-full h-64 mt-4 bg-white/5 dark:bg-black/40 border border-gray-100 dark:border-white/10 rounded-2xl p-4">
+            <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data}>
+                    <defs>
+                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#888888" opacity={0.1} />
+                    <XAxis dataKey="name" stroke="#888888" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888888" fontSize={10} tickLine={false} axisLine={false} />
+                    <Tooltip contentStyle={{ backgroundColor: '#000', border: 'none', borderRadius: '10px', fontSize: '10px' }} />
+                    <Area type="monotone" dataKey="value" stroke="#10b981" fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
+                </AreaChart>
+            </ResponsiveContainer>
+        </div>
+    );
+};
+
+const SlideDeck = ({ slides }) => {
+    const [current, setCurrent] = useState(0);
+    return (
+        <div className="w-full max-w-2xl mx-auto my-8 bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-3xl overflow-hidden shadow-2xl">
+            <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800">
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Neural Presentation</span>
+                <span className="text-[10px] font-bold text-gray-400">{current + 1} / {slides.length}</span>
+            </div>
+            <div className="p-8 min-h-[300px] flex flex-col justify-center animate-in fade-in slide-in-from-right-4 duration-500" key={current}>
+                <h3 className="text-2xl font-bold mb-4">{slides[current].title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{slides[current].content}</p>
+            </div>
+            <div className="flex gap-2 p-4 bg-gray-50/50 dark:bg-black/20">
+                <button onClick={() => setCurrent(Math.max(0, current - 1))} className="flex-1 py-2 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs font-bold hover:bg-emerald-50 transition-all disabled:opacity-30" disabled={current === 0}>Previous</button>
+                <button onClick={() => setCurrent(Math.min(slides.length - 1, current + 1))} className="flex-1 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:opacity-90 transition-all disabled:opacity-30" disabled={current === slides.length - 1}>Next Perspective</button>
+            </div>
+        </div>
+    );
+};
 
 const TypewriterMarkdown = ({ text, animate }) => {
     const [displayedText, setDisplayedText] = useState(animate ? '' : text);
@@ -104,12 +162,32 @@ const TypewriterMarkdown = ({ text, animate }) => {
             components={{
                 code({ node, inline, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
+                    const content = String(children).replace(/\n$/, '');
+
+                    if (!inline && match && match[1] === 'chart') {
+                        try {
+                            const data = JSON.parse(content);
+                            return <DataChart data={data} />;
+                        } catch (e) {
+                            return <code className={className}>{children}</code>;
+                        }
+                    }
+
+                    if (!inline && match && match[1] === 'slides') {
+                        try {
+                            const slides = JSON.parse(content);
+                            return <SlideDeck slides={slides} />;
+                        } catch (e) {
+                            return <code className={className}>{children}</code>;
+                        }
+                    }
+
                     return !inline && match ? (
                         <div className="relative group/code my-4 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg">
                             <div className="flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{match[1]}</span>
                                 <button 
-                                    onClick={() => navigator.clipboard.writeText(String(children).replace(/\n$/, ''))}
+                                    onClick={() => navigator.clipboard.writeText(content)}
                                     className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-cyan-400 hover:opacity-70 transition-opacity"
                                 >
                                     Copy
@@ -117,7 +195,7 @@ const TypewriterMarkdown = ({ text, animate }) => {
                             </div>
                             <SyntaxHighlighter
                                 {...props}
-                                children={String(children).replace(/\n$/, '')}
+                                children={content}
                                 style={vscDarkPlus}
                                 language={match[1]}
                                 PreTag="div"
@@ -188,14 +266,45 @@ const Dashboard = () => {
 
     const [isTourActive, setIsTourActive] = useState(false);
     const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+    const [isCustomPersonaModalOpen, setIsCustomPersonaModalOpen] = useState(false);
     const [previewCode, setPreviewCode] = useState('');
     const [credits, setCredits] = useState(() => {
+        const today = new Date().toDateString();
+        const savedDate = localStorage.getItem('zylron_credits_date');
+        // If saved date is different from today → new day → reset credits
+        if (savedDate !== today) {
+            localStorage.setItem('zylron_credits', '0');
+            localStorage.setItem('zylron_credits_date', today);
+            return 0;
+        }
         return parseInt(localStorage.getItem('zylron_credits')) || 0;
+    });
+    const [xp, setXp] = useState(() => {
+        return parseInt(localStorage.getItem('zylron_xp')) || 0;
     });
 
     useEffect(() => {
+        const today = new Date().toDateString();
         localStorage.setItem('zylron_credits', credits);
-    }, [credits]);
+        localStorage.setItem('zylron_credits_date', today);
+        localStorage.setItem('zylron_xp', xp);
+    }, [credits, xp]);
+
+    // Midnight auto-reset: check every minute if day changed
+    useEffect(() => {
+        const midnightCheck = setInterval(() => {
+            const today = new Date().toDateString();
+            const savedDate = localStorage.getItem('zylron_credits_date');
+            if (savedDate !== today) {
+                setCredits(0);
+                localStorage.setItem('zylron_credits', '0');
+                localStorage.setItem('zylron_credits_date', today);
+                setFeedbackToast('🌅 New day! Your 50 daily AI credits have been reset!');
+                setTimeout(() => setFeedbackToast(null), 4000);
+            }
+        }, 60000); // Check every 60 seconds
+        return () => clearInterval(midnightCheck);
+    }, []);
 
     const handlePersonaChange = (newPersona) => {
         if (newPersona === persona) return;
@@ -234,6 +343,48 @@ const Dashboard = () => {
     const [isSearchMode, setIsSearchMode] = useState(false);
     const [isGeneratingImage, setIsGeneratingImage] = useState(false);
     const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+
+    // Feature 2: Semantic Memory
+    // (isMemoryEnabled already declared above)
+
+    // Feature 3: Prompt Engineering Studio
+    const [isPromptStudio, setIsPromptStudio] = useState(false);
+
+    // Feature 10: Global Language Engine
+    const [activeLanguage, setActiveLanguage] = useState(localStorage.getItem('zylron_lang') || 'auto');
+    const [showLangMenu, setShowLangMenu] = useState(false);
+    const LANGUAGES = [
+        { code: 'auto', label: '🌐 Auto' },
+        { code: 'tamil', label: '🇮🇳 Tamil' },
+        { code: 'hindi', label: '🇮🇳 Hindi' },
+        { code: 'french', label: '🇫🇷 French' },
+        { code: 'spanish', label: '🇪🇸 Spanish' },
+        { code: 'german', label: '🇩🇪 German' },
+        { code: 'japanese', label: '🇯🇵 Japanese' },
+    ];
+
+    // Feature 13: Webcam Vision Live
+    const [isWebcamActive, setIsWebcamActive] = useState(false);
+    const webcamRef = useRef(null);
+    const webcamStreamRef = useRef(null);
+
+    // NEW FEATURES
+    // Feature A: Focus Mode
+    const [isFocusMode, setIsFocusMode] = useState(false);
+    // Feature B: Chat Search
+    const [showChatSearch, setShowChatSearch] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    // Feature C: Pin Messages
+    const [pinnedMessages, setPinnedMessages] = useState([]);
+    // Feature D: Chat Statistics Modal
+    const [showStatsModal, setShowStatsModal] = useState(false);
+    // Feature E: Model Switcher
+    const [activeModel, setActiveModel] = useState(localStorage.getItem('zylron_model') || 'gemini-1.5-flash');
+    const [showModelMenu, setShowModelMenu] = useState(false);
+    // Feature F: Follow-up Suggestions
+    const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
+    // Feature G: Desktop Notifications
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
     const messagesEndRef = useRef(null);
     const scrollContainerRef = useRef(null);
@@ -455,8 +606,18 @@ const Dashboard = () => {
         ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
 
         utterance.voice = premiumVoice;
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
+        // Feature 9: Voice Persona Engine — pitch/rate per persona
+        const personaVoiceMap = {
+            standard:         { rate: 1.0, pitch: 1.0 },
+            code_master:      { rate: 1.1, pitch: 0.85 },
+            sarcastic_genius: { rate: 1.15, pitch: 1.2 },
+            code_architect:   { rate: 0.95, pitch: 0.8 },
+            academic_tutor:   { rate: 0.9, pitch: 1.05 },
+            tech_interviewer: { rate: 1.0, pitch: 0.9 },
+        };
+        const voiceSettings = personaVoiceMap[persona] || { rate: 1.0, pitch: 1.0 };
+        utterance.rate = voiceSettings.rate;
+        utterance.pitch = voiceSettings.pitch;
 
         utterance.onstart = () => setIsSpeakingIndex(index);
         utterance.onend = () => {
@@ -553,8 +714,11 @@ const Dashboard = () => {
             extractTextFromPdf(file);
         } else if (file.type.startsWith("image/")) {
             handleImageUpload(file);
+        } else if (file.name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-zip-compressed') {
+            // Feature 12: Smart Folder Workspace
+            handleZipUpload(file);
         } else {
-            alert("Please upload a PDF or an Image file.");
+            alert("Please upload a PDF, Image, or ZIP file.");
         }
     }, []);
 
@@ -770,6 +934,56 @@ const Dashboard = () => {
         return () => container?.removeEventListener('scroll', handleScroll);
     }, [messages]);
 
+    // Feature 3: Prompt Engineering Studio — optimize prompt with AI
+    const optimizePrompt = async () => {
+        if (!input.trim()) return;
+        setIsPromptStudio(true);
+        try {
+            const optimized = await chatWithGemini(
+                `You are a world-class prompt engineer. Rewrite the following prompt to be more specific, detailed, and effective for an AI. Return ONLY the optimized prompt, nothing else:\n\n"${input}"`,
+                'standard', '', [], null, false
+            );
+            setInput(optimized.replace(/^"|"$/g, '').trim());
+            setFeedbackToast('✨ Prompt optimized to God-Mode!');
+            setTimeout(() => setFeedbackToast(null), 3000);
+        } catch { setFeedbackToast('Prompt Studio failed. Try again.'); }
+        setIsPromptStudio(false);
+    };
+
+    // Feature 12: Smart Folder Workspace — JSZip handler
+    const handleZipUpload = async (file) => {
+        try {
+            const JSZip = (await import('jszip')).default;
+            const zip = await JSZip.loadAsync(file);
+            let structure = `📁 **${file.name}** — Project Structure:\n\n`;
+            const fileList = [];
+            zip.forEach((path) => fileList.push(path));
+            structure += fileList.slice(0, 50).map(f => `• ${f}`).join('\n');
+            if (fileList.length > 50) structure += `\n...and ${fileList.length - 50} more files`;
+            setPdfContext(prev => prev + '\n\n' + structure);
+            setFeedbackToast(`📁 ZIP analyzed: ${fileList.length} files indexed!`);
+            setTimeout(() => setFeedbackToast(null), 3000);
+        } catch (err) {
+            setFeedbackToast('ZIP analysis failed. Check file format.');
+        }
+    };
+
+    // Feature 13: Webcam Vision Live — toggle webcam
+    const toggleWebcam = async () => {
+        if (isWebcamActive) {
+            webcamStreamRef.current?.getTracks().forEach(t => t.stop());
+            setIsWebcamActive(false);
+            return;
+        }
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            webcamStreamRef.current = stream;
+            setIsWebcamActive(true);
+            setFeedbackToast('📷 Zylron Vision Live activated!');
+            setTimeout(() => setFeedbackToast(null), 2000);
+        } catch { setFeedbackToast('Camera access denied.'); }
+    };
+
     const sendMessage = async (e) => {
         if (e && e.preventDefault) e.preventDefault();
         if (!input.trim() && !activePdf && !activeImage) return;
@@ -805,8 +1019,10 @@ const Dashboard = () => {
             type: 'user', 
             content: userMsg, 
             imageUrl: imageUrlForUI || null,
-            animate: false 
+            animate: false,
+            timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
         }];
+        setFollowUpSuggestions([]);
         setMessages(updatedMessages);
         setIsLoading(true);
 
@@ -859,10 +1075,37 @@ const Dashboard = () => {
         try {
             const chronosContext = `\n\n[CHRONOS ENGINE: Current local time is ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST). Use this for real-time awareness.]\n`;
             const searchContext = isSearchMode ? "\n\n[SEARCH MODE ACTIVE: You have access to real-time web intelligence. Use the most recent facts.]\n" : "";
-            const aiResponse = await chatWithGemini(userMsg || "Please describe this image.", persona, pdfContext + memoryContext + searchContext + chronosContext, geminiHistory, imagePayload, isSearchMode);
-            const finalMessages = [...updatedMessages, { type: 'ai', content: aiResponse, animate: true }];
+            // Feature 10: Global Language Engine
+            const langContext = activeLanguage !== 'auto' ? `\n\n[LANGUAGE ENGINE: You MUST respond ENTIRELY in ${activeLanguage}. Do not use any other language.]\n` : "";
+            // Feature 14: Zylron Automation — URL context scraping
+            const urlRegex = /https?:\/\/[^\s]+/g;
+            const detectedUrls = userMsg.match(urlRegex);
+            let urlContext = "";
+            if (detectedUrls && detectedUrls.length > 0) {
+                urlContext = `\n\n[ZYLRON AUTOMATION: User shared these URLs: ${detectedUrls.join(', ')}. Analyze and reference them in your response.]\n`;
+            }
+            const aiResponse = await chatWithGemini(userMsg || "Please describe this image.", persona, pdfContext + memoryContext + searchContext + chronosContext + langContext + urlContext, geminiHistory, imagePayload, isSearchMode);
+            const ts = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            const finalMessages = [...updatedMessages, { type: 'ai', content: aiResponse, animate: true, timestamp: ts }];
+            
             setMessages(finalMessages);
+            setIsLoading(false); // 🔥 Fix: Hide loading dots immediately after main response
             setCredits(prev => Math.min(prev + 1, 50));
+            setXp(prev => prev + 10);
+
+            // Feature F: AI Follow-up Suggestions (generate in background)
+            chatWithGemini(
+                `Based on this AI response, suggest exactly 3 short follow-up questions the user might ask. Return ONLY a JSON array of 3 strings, no explanation: ${aiResponse.slice(0, 300)}`,
+                'standard', '', [], null, false
+            ).then(suggestionsRaw => {
+                const match = suggestionsRaw.match(/\[.*?\]/s);
+                if (match) setFollowUpSuggestions(JSON.parse(match[0]).slice(0, 3));
+            }).catch(() => setFollowUpSuggestions([]));
+
+            // Feature G: Desktop Notification
+            if (notificationsEnabled && document.hidden) {
+                new Notification('Zylron AI ⚡', { body: aiResponse.slice(0, 80) + '...', icon: '/logo.png' });
+            }
             
             // Auto-speak if enabled or continuous
             if (isAutoSpeak || isContinuousVoice) {
@@ -873,9 +1116,41 @@ const Dashboard = () => {
             saveToCloud(sessionId, finalMessages).catch(console.error);
         } catch (error) {
             setMessages(prev => [...prev, { type: 'error', content: error.message }]);
-        } finally {
             setIsLoading(false);
         }
+    };
+
+    // Feature B2: Keyboard Shortcuts
+    useEffect(() => {
+        const handler = (e) => {
+            if (e.ctrlKey && e.key === 'Enter') { sendMessage({ preventDefault: () => {} }); }
+            if (e.ctrlKey && e.key === 'k') { e.preventDefault(); setMessages([]); setFollowUpSuggestions([]); setCurrentSessionId(null); setFeedbackToast('🆕 New chat started! (Ctrl+K)'); setTimeout(() => setFeedbackToast(null), 2000); }
+            if (e.ctrlKey && e.key === '/') { e.preventDefault(); document.getElementById('chat-input-main')?.focus(); }
+            if (e.ctrlKey && e.key === 'f') { e.preventDefault(); setShowChatSearch(p => !p); }
+            if (e.key === 'Escape') { setShowChatSearch(false); setSearchQuery(''); setIsFocusMode(false); }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [input, messages]);
+
+    // Feature G2: Request Desktop Notification permission
+    const enableDesktopNotifications = async () => {
+        if (!('Notification' in window)) { setFeedbackToast('❌ Browser does not support notifications'); return; }
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') { setNotificationsEnabled(true); setFeedbackToast('🔔 Desktop notifications enabled!'); }
+        else setFeedbackToast('❌ Notification permission denied');
+        setTimeout(() => setFeedbackToast(null), 2500);
+    };
+
+    // Compute chat statistics
+    const chatStats = {
+        totalMessages: messages.filter(m => !m.isSystem).length,
+        userMessages: messages.filter(m => m.type === 'user').length,
+        aiMessages: messages.filter(m => m.type === 'ai' && !m.isSystem).length,
+        wordsGenerated: messages.filter(m => m.type === 'ai').reduce((acc, m) => acc + (m.content?.split(' ').length || 0), 0),
+        pinnedCount: pinnedMessages.length,
+        currentPersona: persona.replace(/_/g, ' ').toUpperCase(),
+        level: Math.floor(Math.sqrt(xp / 100)) + 1,
     };
 
     return (
@@ -896,6 +1171,7 @@ const Dashboard = () => {
                     currentSessionId={currentSessionId} 
                     deleteSession={deleteSession} 
                     credits={credits} 
+                    xp={xp}
                     onShare={handleShareChat}
                     onExportPDF={exportToPDF}
                     onExportMD={exportToMarkdown}
@@ -963,6 +1239,13 @@ const Dashboard = () => {
                                         <p.icon size={16} /> {p.name}
                                     </button>
                                 ))}
+                                <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+                                <button 
+                                    onClick={() => { setPersonaDropdownOpen(false); setIsCustomPersonaModalOpen(true); }}
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-emerald-600 dark:text-cyan-400 hover:bg-emerald-50 dark:hover:bg-cyan-900/20 transition-all font-bold"
+                                >
+                                    <Plus size={16} /> Add Custom Persona
+                                </button>
                             </div>
                         )}
 
@@ -1062,6 +1345,43 @@ const Dashboard = () => {
                             <Download size={20} />
                         </button>
 
+                        {/* Model Switcher */}
+                        <div className="relative hidden md:block">
+                            <button onClick={() => setShowModelMenu(p => !p)} className={`flex items-center gap-1 px-2 py-1.5 rounded-xl text-[10px] font-bold border transition-all focus:outline-none ${activeModel.includes('flash') ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-500/40' : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-300 dark:border-indigo-500/40'}`} title="Switch Gemini Model">
+                                <Cpu size={13} />{activeModel.includes('flash') ? 'Flash' : 'Pro'}
+                            </button>
+                            {showModelMenu && (
+                                <div className="absolute top-full mt-2 right-0 w-48 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl py-2 z-50">
+                                    {[{id:'gemini-1.5-flash',label:'⚡ Gemini Flash',sub:'Fast & efficient'},{id:'gemini-1.5-pro',label:'🧠 Gemini Pro',sub:'Smart & capable'}].map(m => (
+                                        <button key={m.id} onClick={() => { setActiveModel(m.id); localStorage.setItem('zylron_model', m.id); setShowModelMenu(false); setFeedbackToast(`🤖 Switched to ${m.label}!`); setTimeout(() => setFeedbackToast(null), 2000); }} className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all ${activeModel === m.id ? 'text-emerald-600 dark:text-cyan-400 font-bold' : 'text-gray-700 dark:text-gray-300'}`}>
+                                            <p className="text-xs font-bold">{m.label}</p>
+                                            <p className="text-[10px] text-gray-400">{m.sub}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Chat Search */}
+                        <button onClick={() => setShowChatSearch(p => !p)} className={`p-2 rounded-full transition-all focus:outline-none hidden md:flex ${showChatSearch ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`} title="Search Chat (Ctrl+F)">
+                            <SearchCheck size={20} />
+                        </button>
+
+                        {/* Chat Stats */}
+                        <button onClick={() => setShowStatsModal(true)} disabled={messages.length === 0} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 hidden md:flex" title="Chat Statistics">
+                            <BarChart3 size={20} />
+                        </button>
+
+                        {/* Focus Mode */}
+                        <button onClick={() => setIsFocusMode(p => !p)} className={`p-2 rounded-full transition-all focus:outline-none hidden md:flex ${isFocusMode ? 'text-purple-500 bg-purple-50 dark:bg-purple-900/20' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`} title="Focus Mode (Esc to exit)">
+                            {isFocusMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+                        </button>
+
+                        {/* Desktop Notifications */}
+                        <button onClick={enableDesktopNotifications} className={`p-2 rounded-full transition-all focus:outline-none hidden md:flex ${notificationsEnabled ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`} title="Desktop Notifications">
+                            <BellRing size={20} />
+                        </button>
+
                         <button 
                             onClick={toggleTheme} 
                             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none"
@@ -1097,7 +1417,26 @@ const Dashboard = () => {
                 {/* Main Chat Area */}
                 <div {...getRootProps()} ref={scrollContainerRef} className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-8 relative scroll-smooth">
                     <input {...getInputProps()} />
-                    
+
+                    {/* Chat Search Bar */}
+                    {showChatSearch && (
+                        <div className="sticky top-0 z-30 mb-4 animate-in slide-in-from-top-2 duration-200">
+                            <div className="flex items-center gap-3 bg-white dark:bg-gray-900 border border-emerald-300 dark:border-cyan-500/50 rounded-2xl px-4 py-2.5 shadow-lg">
+                                <Search size={16} className="text-emerald-500 dark:text-cyan-400 shrink-0" />
+                                <input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search messages... (Esc to close)" className="flex-1 bg-transparent text-sm outline-none text-gray-800 dark:text-white placeholder-gray-400" />
+                                {searchQuery && <span className="text-[10px] font-bold text-gray-400">{messages.filter(m => m.content?.toLowerCase().includes(searchQuery.toLowerCase())).length} found</span>}
+                                <button onClick={() => { setShowChatSearch(false); setSearchQuery(''); }} className="text-gray-400 hover:text-red-500 transition-colors"><X size={14} /></button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Focus Mode Overlay — click to exit */}
+                    {isFocusMode && (
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 flex items-end justify-center pb-8" onClick={() => setIsFocusMode(false)}>
+                            <p className="text-white/50 text-xs">Press Esc or click anywhere to exit Focus Mode</p>
+                        </div>
+                    )}
+
                     {/* Drag and Drop Overlay */}
                     {isDragActive && (
                         <div className="absolute inset-0 z-50 bg-emerald-500/10 dark:bg-cyan-500/10 backdrop-blur-md flex flex-col items-center justify-center border-4 border-dashed border-emerald-500 dark:border-cyan-400 rounded-3xl m-4 pointer-events-none animate-in fade-in duration-300">
@@ -1108,17 +1447,76 @@ const Dashboard = () => {
                     )}
 
                     {messages.length === 0 ? (
-                        /* Empty Welcoming State (Gemini Style) */
-                        <div className="h-full flex flex-col items-center justify-center p-8 -mt-10 animate-fade-in">
-                            <div className="w-16 h-16 rounded-3xl bg-white dark:bg-black border border-emerald-200 dark:border-cyan-500/30 flex items-center justify-center mb-6 shadow-lg dark:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300 hover:scale-105 overflow-hidden">
-                                <img src={ZylronLogo} alt="Zylron AI Logo" className="w-full h-full object-cover" />
+                        /* Premium Welcome State — 15 Features Showcase */
+                        <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 animate-fade-in overflow-y-auto">
+                            {/* Logo + Title */}
+                            <div className="flex flex-col items-center mb-6 md:mb-8">
+                                <div className="relative mb-4">
+                                    <div className="w-20 h-20 rounded-3xl overflow-hidden border-2 border-cyan-500/40 dark:border-cyan-500/40 border-emerald-400/40 shadow-xl dark:shadow-[0_0_30px_rgba(6,182,212,0.3)] animate-neural-pulse">
+                                        <img src={ZylronLogo} alt="Zylron AI" className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 dark:bg-cyan-400 rounded-full border-2 border-white dark:border-black shadow-lg animate-pulse" />
+                                </div>
+                                <h1 className="text-3xl md:text-5xl font-bold text-center mb-2">
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 dark:from-cyan-400 dark:via-blue-400 dark:to-emerald-400">
+                                        Hello, {user?.name?.split(' ')[0] || 'there'} 👋
+                                    </span>
+                                </h1>
+                                <p className="text-gray-500 dark:text-gray-400 text-center max-w-lg text-base md:text-lg font-medium">
+                                    {activePdf ? `📄 I've analyzed ${activePdf.name}. Ask me anything!` : "Your Neural AI is ready. What can I do for you?"}
+                                </p>
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-800 dark:from-cyan-400 dark:to-blue-500 mb-3 text-center transition-all duration-300">
-                                Hello, {user?.name?.split(' ')[0] || 'there'}
-                            </h1>
-                            <p className="text-gray-500 dark:text-gray-400 text-center max-w-md text-lg">
-                                How can I help you today? {activePdf ? `I've analyzed ${activePdf.name}. Ask me anything about it!` : "Ask me any question, upload a PDF, or just chat."}
-                            </p>
+
+                            {/* 15 Feature Cards Grid */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3 w-full max-w-5xl mb-6">
+                                {[
+                                    { icon: '🧠', label: 'AI Personas', desc: '6+ neural modes', color: 'from-purple-500/20 to-violet-500/20', border: 'border-purple-500/30', glow: 'shadow-purple-500/10', action: () => { setFeedbackToast('🧠 Click the "Standard" dropdown in the header to switch AI personas!'); setTimeout(() => setFeedbackToast(null), 3500); } },
+                                    { icon: '📄', label: 'PDF Analysis', desc: 'Smart doc reader', color: 'from-emerald-500/20 to-green-500/20', border: 'border-emerald-500/30', glow: 'shadow-emerald-500/10', action: () => { setFeedbackToast('📄 Click the Upload Cloud icon in the input bar to upload a PDF!'); setTimeout(() => setFeedbackToast(null), 3500); } },
+                                    { icon: '🖼️', label: 'Vision AI', desc: 'Image analysis', color: 'from-blue-500/20 to-sky-500/20', border: 'border-blue-500/30', glow: 'shadow-blue-500/10', action: () => { setFeedbackToast('🖼️ Click the Camera icon in the input bar to upload an image for analysis!'); setTimeout(() => setFeedbackToast(null), 3500); } },
+                                    { icon: '🎙️', label: 'Voice Input', desc: 'Speech to text', color: 'from-red-500/20 to-rose-500/20', border: 'border-red-500/30', glow: 'shadow-red-500/10', action: () => { startListening(); setFeedbackToast('🎙️ Listening... speak now!'); setTimeout(() => setFeedbackToast(null), 3000); } },
+                                    { icon: '🔊', label: 'Auto-Speak', desc: 'TTS responses', color: 'from-orange-500/20 to-amber-500/20', border: 'border-orange-500/30', glow: 'shadow-orange-500/10', action: () => { setIsAutoSpeak(p => !p); setFeedbackToast(isAutoSpeak ? '🔇 Auto-Speak OFF' : '🔊 Auto-Speak ON — AI will read all responses!'); setTimeout(() => setFeedbackToast(null), 2500); } },
+                                    { icon: '🌐', label: 'Web Search', desc: 'Live internet', color: 'from-amber-500/20 to-yellow-500/20', border: 'border-amber-500/30', glow: 'shadow-amber-500/10', action: () => { setIsSearchMode(p => !p); setFeedbackToast(isSearchMode ? '🔍 Search Mode OFF' : '🌐 Search Mode ON — Zylron uses live web data!'); setTimeout(() => setFeedbackToast(null), 2500); } },
+                                    { icon: '👁️', label: 'Zylron Sense', desc: 'Gesture control', color: 'from-cyan-500/20 to-teal-500/20', border: 'border-cyan-500/30', glow: 'shadow-cyan-500/10', action: () => { setFeedbackToast('👁️ Click the Eye icon in the header to activate gesture control!'); setTimeout(() => setFeedbackToast(null), 3500); } },
+                                    { icon: '💻', label: 'Live Preview', desc: 'Code renderer', color: 'from-indigo-500/20 to-blue-500/20', border: 'border-indigo-500/30', glow: 'shadow-indigo-500/10', action: () => setInput('Build me a beautiful landing page with HTML, CSS and JavaScript') },
+                                    { icon: '📊', label: 'Data Charts', desc: 'AI visualizations', color: 'from-teal-500/20 to-emerald-500/20', border: 'border-teal-500/30', glow: 'shadow-teal-500/10', action: () => setInput('Create a data chart showing monthly sales trends for 2024') },
+                                    { icon: '🎭', label: 'Custom Persona', desc: 'Build your AI', color: 'from-pink-500/20 to-rose-500/20', border: 'border-pink-500/30', glow: 'shadow-pink-500/10', action: () => { setFeedbackToast('🎭 Click the Persona dropdown → "+ Add Custom Persona" to build your AI!'); setTimeout(() => setFeedbackToast(null), 3500); } },
+                                    { icon: '✨', label: 'Prompt Studio', desc: 'AI optimizes prompt', color: 'from-violet-500/20 to-purple-500/20', border: 'border-violet-500/30', glow: 'shadow-violet-500/10', action: () => { setFeedbackToast('✨ Type any prompt in the input bar, then click the Wand 🪄 icon to optimize it!'); setTimeout(() => setFeedbackToast(null), 4000); } },
+                                    { icon: '🌍', label: 'Language Engine', desc: 'Respond in any lang', color: 'from-amber-500/20 to-orange-500/20', border: 'border-amber-500/30', glow: 'shadow-amber-500/10', action: () => { setFeedbackToast('🌍 Click the Globe icon in the input bar to switch response language!'); setTimeout(() => setFeedbackToast(null), 3500); } },
+                                    { icon: '📁', label: 'ZIP Workspace', desc: 'Project analyzer', color: 'from-slate-500/20 to-gray-500/20', border: 'border-slate-500/30', glow: 'shadow-slate-500/10', action: () => { setFeedbackToast('📁 Click the Folder icon in the input bar to upload a ZIP project for analysis!'); setTimeout(() => setFeedbackToast(null), 3500); } },
+                                    { icon: '⚡', label: 'Neural XP', desc: `Level ${Math.floor(Math.sqrt(xp / 100)) + 1} · ${xp} XP`, color: 'from-yellow-500/20 to-amber-500/20', border: 'border-yellow-500/30', glow: 'shadow-yellow-500/10', action: () => { setFeedbackToast(`⚡ You are Level ${Math.floor(Math.sqrt(xp / 100)) + 1} with ${xp} XP! Send messages to earn more XP!`); setTimeout(() => setFeedbackToast(null), 3500); } },
+                                    { icon: '☁️', label: 'Cloud Sync', desc: 'Auto-saves chats', color: 'from-sky-500/20 to-blue-500/20', border: 'border-sky-500/30', glow: 'shadow-sky-500/10', action: () => { setFeedbackToast('☁️ All your chats auto-sync to Firebase Cloud. Open Sidebar to see history!'); setTimeout(() => setFeedbackToast(null), 3500); } },
+                                ].map((feat, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={feat.action}
+                                        className={`feature-card group flex flex-col items-start gap-1.5 p-3 rounded-2xl bg-gradient-to-br ${feat.color} border ${feat.border} shadow-md ${feat.glow} hover:border-opacity-60 transition-all duration-300 text-left`}
+                                    >
+                                        <span className="text-xl group-hover:scale-110 transition-transform duration-300">{feat.icon}</span>
+                                        <div>
+                                            <p className="text-[11px] font-bold text-gray-800 dark:text-white leading-tight">{feat.label}</p>
+                                            <p className="text-[9px] text-gray-500 dark:text-gray-400 font-medium leading-tight">{feat.desc}</p>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Quick Action Prompts */}
+                            <div className="flex flex-wrap justify-center gap-2 max-w-2xl">
+                                {[
+                                    { label: '✨ Generate an image', prompt: 'Generate a stunning futuristic cityscape at night' },
+                                    { label: '💡 Explain a concept', prompt: 'Explain quantum computing in simple terms' },
+                                    { label: '🔧 Write code', prompt: 'Write a Python web scraper with BeautifulSoup' },
+                                    { label: '📊 Analyze data', prompt: 'Create a bar chart showing global temperature rise from 2000-2024' },
+                                ].map((p, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setInput(p.prompt)}
+                                        className="px-4 py-2 rounded-xl bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-gray-200 dark:border-gray-700/60 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-cyan-900/30 hover:text-emerald-700 dark:hover:text-cyan-300 hover:border-emerald-300 dark:hover:border-cyan-500/50 transition-all duration-300 shadow-sm"
+                                    >
+                                        {p.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     ) : (
                         /* Active Chat Log */
@@ -1146,9 +1544,15 @@ const Dashboard = () => {
                                                 ? 'bg-emerald-50 dark:bg-black border border-gray-200 dark:border-cyan-500/60 text-black dark:text-white rounded-tr-sm shadow-sm dark:shadow-[0_0_15px_rgba(0,255,255,0.2)]'
                                                 : msg.type === 'error'
                                                     ? 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/50 text-red-600 dark:text-red-400 shadow-sm dark:shadow-[0_0_15px_rgba(239,68,68,0.2)] rounded-tl-sm'
-                                                    : 'bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-black dark:text-white rounded-tl-sm shadow-sm dark:shadow-lg'
+                                                    : 'bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-black dark:text-white rounded-tl-sm shadow-sm dark:shadow-xl'
                                                 }`}
-                                                style={msg.type === 'ai' ? { borderLeftColor: 'var(--persona-color)', borderLeftWidth: '4px' } : {}}
+                                                style={msg.type === 'ai' ? { 
+                                                    borderLeft: `4px solid var(--persona-color)`,
+                                                    background: theme === 'dark' 
+                                                        ? `linear-gradient(to bottom right, rgba(15, 23, 42, 0.8), rgba(0, 0, 0, 0.9))` 
+                                                        : `linear-gradient(to bottom right, rgba(255, 255, 255, 1), rgba(243, 244, 246, 0.5))`,
+                                                    boxShadow: `0 4px 20px -5px rgba(0, 0, 0, 0.1), 0 0 15px -3px var(--persona-glow)`
+                                                } : {}}
                                             >
                                                 {msg.type === 'user' ? (
                                                     <div className="flex flex-col gap-3">
@@ -1226,6 +1630,18 @@ const Dashboard = () => {
                                                             <button type="button" onClick={() => speakText(msg.content, idx)} className={`p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all ${isSpeakingIndex === idx ? 'text-emerald-500 dark:text-cyan-400 animate-pulse' : 'text-gray-400'}`}>
                                                                 {isSpeakingIndex === idx ? <VolumeX size={14} /> : <Volume2 size={14} />}
                                                             </button>
+
+                                                            {/* Pin button */}
+                                                            {msg.type === 'ai' && !msg.isSystem && (
+                                                                <button onClick={() => setPinnedMessages(prev => prev.find(p => p === msg) ? prev.filter(p => p !== msg) : [...prev, msg])} className="p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all" title="Pin message">
+                                                                    {pinnedMessages.includes(msg) ? <PinOff size={14} className="text-amber-500" /> : <Pin size={14} className="text-gray-400" />}
+                                                                </button>
+                                                            )}
+
+                                                            {/* Timestamp */}
+                                                            {msg.timestamp && (
+                                                                <span className="text-[9px] text-gray-400 dark:text-gray-600 font-bold ml-2 self-center">{msg.timestamp}</span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 )}
@@ -1250,6 +1666,32 @@ const Dashboard = () => {
                                 </div>
                             )}
                             <div ref={messagesEndRef} />
+
+                            {/* AI Follow-up Suggestions */}
+                            {followUpSuggestions.length > 0 && !isLoading && (
+                                <div className="flex flex-wrap gap-2 mt-4 mb-2 px-2 animate-in slide-in-from-bottom-3 duration-400">
+                                    <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 self-center">💡 Follow up:</span>
+                                    {followUpSuggestions.map((s, i) => (
+                                        <button key={i} onClick={() => setInput(s)} className="px-3 py-1.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-[11px] font-semibold text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-cyan-900/30 hover:text-emerald-700 dark:hover:text-cyan-300 hover:border-emerald-300 dark:hover:border-cyan-500/50 transition-all shadow-sm">
+                                            {s}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Pinned Messages Tray */}
+                            {pinnedMessages.length > 0 && (
+                                <div className="sticky bottom-0 bg-amber-50/90 dark:bg-amber-900/20 border-t border-amber-200 dark:border-amber-500/30 backdrop-blur-sm px-4 py-2 z-20">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <Pin size={12} className="text-amber-500 shrink-0" />
+                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">{pinnedMessages.length} Pinned</span>
+                                        {pinnedMessages.map((m, i) => (
+                                            <span key={i} className="text-[10px] bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 rounded-full text-amber-700 dark:text-amber-300 truncate max-w-[150px]">{m.content?.slice(0, 40)}...</span>
+                                        ))}
+                                        <button onClick={() => setPinnedMessages([])} className="ml-auto text-[10px] text-amber-500 hover:text-red-500 font-bold">Clear</button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -1308,19 +1750,6 @@ const Dashboard = () => {
                             )}
                         </div>
 
-                        {/* Quick Prompt Library */}
-                        <div className="flex gap-2 w-full max-w-full overflow-x-auto pb-2 scrollbar-hide px-1" style={{ WebkitOverflowScrolling: 'touch' }}>
-                            {QUICK_PROMPTS.map((qp, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => setInput(qp.text)}
-                                    className="whitespace-nowrap px-4 py-2 rounded-xl bg-white/50 dark:bg-gray-900/40 backdrop-blur-md border border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-cyan-900/20 hover:text-emerald-600 dark:hover:text-cyan-400 hover:border-emerald-300 dark:hover:border-cyan-500/50 transition-all duration-300 shadow-sm"
-                                >
-                                    {qp.label}
-                                </button>
-                            ))}
-                        </div>
-
                         <form onSubmit={sendMessage} className="relative group flex items-center gap-2 sm:gap-3 flex-row">
                             <div className="relative flex-1 flex items-center w-full bg-white/80 dark:bg-gray-900/50 backdrop-blur-xl border border-gray-200 dark:border-gray-800/50 rounded-2xl shadow-sm dark:shadow-[0_0_10px_rgba(0,255,255,0.1)] focus-within:shadow-md dark:focus-within:shadow-[0_0_20px_rgba(0,255,255,0.3)] focus-within:border-emerald-300 dark:focus-within:border-cyan-500/50 transition-all duration-300">
                                 {showEmojiPicker && (
@@ -1328,6 +1757,31 @@ const Dashboard = () => {
                                         <EmojiPicker theme={theme === 'dark' ? 'dark' : 'light'} onEmojiClick={onEmojiClick} />
                                     </div>
                                 )}
+                                {/* Feature 2: Memory | Feature 3: Prompt Studio | Feature 10: Language */}
+                                <button type="button" onClick={() => { setIsMemoryEnabled(p => { const v = !p; localStorage.memory = v; return v; }); setFeedbackToast(isMemoryEnabled ? '🧠 Memory OFF' : '🧠 Memory ON — Zylron remembers!'); setTimeout(() => setFeedbackToast(null), 2000); }} className={`p-2 rounded-full transition-all duration-300 focus:outline-none ${isMemoryEnabled ? 'text-emerald-500 dark:text-cyan-400 bg-emerald-50 dark:bg-cyan-400/10 shadow-[0_0_15px_rgba(0,255,255,0.2)]' : 'text-gray-400 hover:text-emerald-500 dark:hover:text-cyan-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`} title="Semantic Memory">
+                                    <Brain size={24} />
+                                </button>
+
+                                <button type="button" onClick={() => { if (!input.trim()) { setFeedbackToast('✨ Type a prompt first, then click Wand to optimize it!'); setTimeout(() => setFeedbackToast(null), 3000); return; } optimizePrompt(); }} disabled={isPromptStudio} className={`p-2 rounded-full transition-all duration-300 focus:outline-none ${isPromptStudio ? 'animate-spin text-purple-500' : 'text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`} title="Prompt Engineering Studio — Type a prompt then click to optimize">
+                                    <Wand2 size={24} />
+                                </button>
+
+                                {/* Language Engine */}
+                                <div className="relative">
+                                    <button type="button" onClick={() => setShowLangMenu(p => !p)} className={`p-2 rounded-full transition-all duration-300 focus:outline-none ${activeLanguage !== 'auto' ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'text-gray-400 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`} title="Global Language Engine">
+                                        <Globe size={24} />
+                                    </button>
+                                    {showLangMenu && (
+                                        <div className="absolute bottom-full mb-2 left-0 w-40 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+                                            {LANGUAGES.map(lang => (
+                                                <button key={lang.code} type="button" onClick={() => { setActiveLanguage(lang.code); localStorage.setItem('zylron_lang', lang.code); setShowLangMenu(false); setFeedbackToast(`🌐 Language: ${lang.label}`); setTimeout(() => setFeedbackToast(null), 2000); }} className={`w-full text-left px-4 py-2 text-xs font-semibold transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${activeLanguage === lang.code ? 'text-amber-500' : 'text-gray-700 dark:text-gray-300'}`}>
+                                                    {lang.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
                                 <button
                                     type="button"
                                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -1372,6 +1826,19 @@ const Dashboard = () => {
                                         />
                                     </div>
 
+                                    {/* Feature 12: ZIP Upload */}
+                                    <div className="relative" title="Upload ZIP Project">
+                                        <div onClick={() => document.getElementById('zip-upload').click()} className="p-2 cursor-pointer text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all duration-300 group/upload">
+                                            <FolderOpen size={22} className="group-hover/upload:scale-110 transition-transform" />
+                                        </div>
+                                        <input id="zip-upload" type="file" className="hidden" accept=".zip" onChange={(e) => e.target.files[0] && handleZipUpload(e.target.files[0])} />
+                                    </div>
+
+                                    {/* Feature 13: Webcam Vision Live */}
+                                    <button type="button" onClick={toggleWebcam} className={`p-2 rounded-full transition-all duration-300 focus:outline-none ${isWebcamActive ? 'text-pink-500 bg-pink-50 dark:bg-pink-900/20 shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'text-gray-400 hover:text-pink-500 dark:hover:text-pink-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`} title="Zylron Vision Live (Webcam)">
+                                        <Video size={22} />
+                                    </button>
+
                                     <button
                                         type="button"
                                         onClick={startListening}
@@ -1390,11 +1857,34 @@ const Dashboard = () => {
                                 {isLoading ? <Loader2 size={24} className="animate-spin text-white dark:text-cyan-400" /> : <Send size={24} className="drop-shadow-none dark:drop-shadow-[0_0_8px_rgba(0,255,255,0.8)] ml-1" />}
                             </button>
                         </form>
-                    </div>
-                    <p className="text-center text-[9px] uppercase tracking-widest text-gray-500 dark:text-gray-600 mt-2 sm:mt-4 font-bold opacity-60 px-4 leading-relaxed">Zylron AI may display inaccurate info, so double-check its responses.</p>
-                </div>
-            </div>
 
+                        {/* Webcam Vision Live Preview */}
+                        {isWebcamActive && (
+                            <div className="relative w-full rounded-2xl overflow-hidden border border-pink-500/30 shadow-xl animate-in slide-in-from-bottom-4 duration-300">
+                                <video ref={el => { if (el && webcamStreamRef.current) el.srcObject = webcamStreamRef.current; el?.play(); }} className="w-full max-h-40 object-cover" autoPlay muted />
+                                <div className="absolute top-2 right-2 flex gap-2">
+                                    <span className="px-2 py-1 bg-pink-500 text-white text-[10px] font-bold rounded-full animate-pulse">LIVE</span>
+                                    <button onClick={toggleWebcam} className="p-1 bg-black/50 text-white rounded-full hover:bg-red-500 transition-all"><X size={12} /></button>
+                                </div>
+                            </div>
+                        )}
+                        {/* Quick Prompt Library - Relocated to Bottom for 'Cinematic' layout */}
+                        <div className="flex gap-2 w-full max-w-full overflow-x-auto pt-2 scrollbar-hide px-1" style={{ WebkitOverflowScrolling: 'touch' }}>
+                            {QUICK_PROMPTS.map((qp, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setInput(qp.text)}
+                                    className="whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white/40 dark:bg-gray-900/30 backdrop-blur-md border border-gray-100 dark:border-gray-800/50 text-[10px] font-bold text-gray-500 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-cyan-900/20 hover:text-emerald-600 dark:hover:text-cyan-400 transition-all duration-300 shadow-sm"
+                                >
+                                    {qp.label}
+                                </button>
+                            ))}
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
             {/* Zylron Sense HCI Component */}
             {isSenseActive && (
                 <ZylronSense 
@@ -1421,6 +1911,19 @@ const Dashboard = () => {
                 isOpen={isCodeModalOpen} 
                 onClose={() => setIsCodeModalOpen(false)} 
                 code={previewCode} 
+            />
+            <CustomPersonaModal 
+                isOpen={isCustomPersonaModalOpen} 
+                onClose={() => setIsCustomPersonaModalOpen(false)}
+                onSave={(newPersona) => {
+                    // Update the local colors object for immediate UI response
+                    personaColors[newPersona.id] = { 
+                        primary: newPersona.color, 
+                        secondary: newPersona.color, 
+                        glow: `rgba(0, 255, 255, 0.4)` 
+                    };
+                    handlePersonaChange(newPersona.id);
+                }}
             />
 
             <Joyride
@@ -1556,6 +2059,41 @@ const Dashboard = () => {
                     </div>
                 )}
             </AnimatePresence>
+
+            {/* Chat Statistics Modal */}
+            {showStatsModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowStatsModal(false)}>
+                    <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-2xl w-full max-w-sm mx-4 overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <BarChart3 size={18} className="text-emerald-500 dark:text-cyan-400" />
+                                <h3 className="font-bold text-gray-900 dark:text-white text-sm">Chat Statistics</h3>
+                            </div>
+                            <button onClick={() => setShowStatsModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={16} /></button>
+                        </div>
+                        <div className="p-6 grid grid-cols-2 gap-3">
+                            {[
+                                { label: 'Total Messages', value: chatStats.totalMessages, color: 'text-emerald-500 dark:text-cyan-400' },
+                                { label: 'Your Messages', value: chatStats.userMessages, color: 'text-blue-500' },
+                                { label: 'AI Responses', value: chatStats.aiMessages, color: 'text-purple-500' },
+                                { label: 'Words Generated', value: chatStats.wordsGenerated.toLocaleString(), color: 'text-amber-500' },
+                                { label: 'Neural XP', value: `${xp} XP`, color: 'text-yellow-500' },
+                                { label: 'Level', value: `Level ${chatStats.level}`, color: 'text-rose-500' },
+                                { label: 'Pinned Messages', value: chatStats.pinnedCount, color: 'text-orange-500' },
+                                { label: 'Active Persona', value: persona.replace(/_/g,' '), color: 'text-teal-500' },
+                            ].map((stat, i) => (
+                                <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-3 text-center">
+                                    <p className={`text-xl font-black ${stat.color}`}>{stat.value}</p>
+                                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">{stat.label}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="px-6 pb-4 text-center">
+                            <p className="text-[10px] text-gray-400">📊 Keep chatting to grow your stats!</p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

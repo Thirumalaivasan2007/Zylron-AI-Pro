@@ -1,7 +1,7 @@
 import { Plus, Trash2, MessageSquare, Zap, Search, RefreshCw, Share2, FileDown, HelpCircle, Download } from 'lucide-react';
 import { useState } from 'react';
 
-const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, deleteSession, credits = 0, onShare, onExportPDF, onExportMD, onTour, onAdmin }) => {
+const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, deleteSession, credits = 0, xp = 0, onShare, onExportPDF, onExportMD, onTour, onAdmin }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredHistory = history.filter(chat => 
@@ -110,6 +110,20 @@ const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, delete
                 >
                     <RefreshCw size={12} className="animate-spin-slow" /> Admin Intelligence
                 </button>
+
+                {/* Hyper-Gen Feature 13: Neural XP Tracker */}
+                <div className="mt-4 p-4 bg-gradient-to-br from-emerald-500/5 to-cyan-500/5 border border-emerald-500/10 dark:border-cyan-500/20 rounded-2xl">
+                    <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Neural Level {Math.floor(Math.sqrt(xp / 100)) + 1}</span>
+                        <span className="text-[10px] font-mono text-cyan-500">{xp} XP</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                        <div 
+                            className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 shadow-[0_0_10px_rgba(0,255,255,0.3)] transition-all duration-1000" 
+                            style={{ width: `${(xp % 100)}%` }}
+                        ></div>
+                    </div>
+                </div>
                 <div className="mt-2.5">
                     <p className="text-[9px] text-gray-400 dark:text-gray-600 leading-relaxed text-center">
                         Need more? <span className="text-emerald-600 dark:text-cyan-400 cursor-pointer hover:underline">Upgrade to Pro</span>
