@@ -1206,14 +1206,12 @@ const Dashboard = () => {
                                 <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-500 via-cyan-500 to-purple-500 rounded-full blur-md opacity-40 group-hover:opacity-100 group-hover:blur-lg transition-all duration-700 animate-spin-slow"></div>
                                 
                                 {/* Logo Container */}
-                                <div className="relative h-9 w-9 sm:h-10 sm:w-10 bg-white dark:bg-black rounded-full flex items-center justify-center border border-white/20 shadow-2xl overflow-hidden ring-1 ring-white/10">
+                                <div className="relative h-8 sm:h-10 w-auto flex items-center justify-center transition-all duration-300">
                                     <img 
                                         src="/logo.png" 
                                         alt="Zylron AI" 
-                                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                        className="h-full w-auto object-contain transition-transform duration-700 group-hover:scale-110" 
                                     />
-                                    {/* Glass Overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
                                 </div>
 
                                 {/* Active Status Dot */}
@@ -1476,11 +1474,12 @@ const Dashboard = () => {
                         <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 animate-fade-in overflow-y-auto">
                             {/* Logo + Title */}
                             <div className="flex flex-col items-center mb-6 md:mb-8">
-                                <div className="relative mb-4">
-                                    <div className="w-20 h-20 rounded-3xl overflow-hidden border-2 border-cyan-500/40 dark:border-cyan-500/40 border-emerald-400/40 shadow-xl dark:shadow-[0_0_30px_rgba(6,182,212,0.3)] animate-neural-pulse bg-gray-50 dark:bg-black flex items-center justify-center p-2">
-                                        <img src="/logo.png" alt="Zylron AI" className="w-full h-full object-contain" />
+                                <div className="relative mb-4 flex items-center justify-center">
+                                    <div className="h-20 md:h-28 w-auto min-w-[5rem] shadow-2xl animate-neural-pulse flex items-center justify-center p-2 relative">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 blur-xl rounded-full"></div>
+                                        <img src="/logo.png" alt="Zylron AI" className="relative h-full w-auto object-contain drop-shadow-[0_0_15px_rgba(0,255,255,0.4)]" />
                                     </div>
-                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 dark:bg-cyan-400 rounded-full border-2 border-white dark:border-black shadow-lg animate-pulse" />
+                                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-emerald-500 dark:bg-cyan-400 rounded-full border-4 border-white dark:border-black shadow-lg animate-pulse z-10" />
                                 </div>
                                 <h1 className="text-3xl md:text-5xl font-bold text-center mb-2">
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 dark:from-cyan-400 dark:via-blue-400 dark:to-emerald-400">
