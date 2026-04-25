@@ -1200,12 +1200,34 @@ const Dashboard = () => {
                         >
                             <Menu size={22} />
                         </button>
-                        <div className="flex items-center gap-2 lg:gap-3 text-emerald-600 dark:text-cyan-400 font-bold text-base sm:text-xl drop-shadow-sm dark:drop-shadow-[0_0_8px_rgba(0,255,255,0.6)]">
-                            <div className="relative flex items-center justify-center">
-                                <div className="absolute inset-0 bg-cyan-500/20 dark:bg-cyan-400/20 blur-lg rounded-full animate-pulse"></div>
-                                <img src={ZylronLogo} alt="Zylron AI Logo" className="relative h-8 w-8 sm:h-10 sm:w-10 object-contain mr-1 hover:scale-110 transition-transform duration-500 cursor-pointer" />
+                        <div className="flex items-center gap-3 text-emerald-600 dark:text-cyan-400 font-bold drop-shadow-sm">
+                            <div className="relative group cursor-pointer">
+                                {/* Neural Orbit Ring */}
+                                <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-500 via-cyan-500 to-purple-500 rounded-full blur-md opacity-40 group-hover:opacity-100 group-hover:blur-lg transition-all duration-700 animate-spin-slow"></div>
+                                
+                                {/* Logo Container */}
+                                <div className="relative h-9 w-9 sm:h-11 sm:w-11 bg-white dark:bg-black rounded-full flex items-center justify-center border border-white/20 shadow-2xl overflow-hidden ring-1 ring-white/10">
+                                    <img 
+                                        src={ZylronLogo} 
+                                        alt="Zylron AI" 
+                                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                    />
+                                    {/* Glass Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
+                                </div>
+
+                                {/* Active Status Dot */}
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 dark:bg-cyan-400 rounded-full border-2 border-white dark:border-black shadow-[0_0_10px_rgba(0,255,255,0.8)]"></div>
                             </div>
-                            <span className="hidden sm:block text-sm sm:text-lg tracking-tight bg-gradient-to-r from-emerald-600 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">Zylron AI</span>
+                            
+                            <div className="flex flex-col">
+                                <span className="hidden sm:block text-lg sm:text-xl font-black tracking-tighter bg-gradient-to-r from-emerald-500 via-cyan-400 to-blue-500 bg-clip-text text-transparent leading-none">
+                                    Zylron AI
+                                </span>
+                                <span className="hidden sm:block text-[8px] uppercase tracking-[0.3em] font-black text-gray-400 dark:text-cyan-500/50 mt-0.5">
+                                    Neural Operating System
+                                </span>
+                            </div>
                         </div>
                     </div>
 

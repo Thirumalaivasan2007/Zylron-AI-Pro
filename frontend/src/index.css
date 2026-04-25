@@ -254,3 +254,24 @@ code, pre, .font-mono {
   .animation-delay-300 { animation-delay: 0.3s; }
   .animation-delay-500 { animation-delay: 0.5s; }
 }
+
+/* ============================================
+   ADVANCED NEURAL ANIMATIONS
+   ============================================ */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+@keyframes neural-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.animate-neural-pulse {
+  animation: neural-pulse 4s ease-in-out infinite;
+}
