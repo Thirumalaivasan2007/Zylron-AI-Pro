@@ -1200,15 +1200,15 @@ const Dashboard = () => {
                         >
                             <Menu size={22} />
                         </button>
-                        <div className="flex items-center gap-3 text-emerald-600 dark:text-cyan-400 font-bold drop-shadow-sm">
-                            <div className="relative group cursor-pointer">
+                        <div className="flex items-center gap-2 sm:gap-3 text-emerald-600 dark:text-cyan-400 font-bold drop-shadow-sm">
+                            <div className="relative group cursor-pointer shrink-0">
                                 {/* Neural Orbit Ring */}
                                 <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-500 via-cyan-500 to-purple-500 rounded-full blur-md opacity-40 group-hover:opacity-100 group-hover:blur-lg transition-all duration-700 animate-spin-slow"></div>
                                 
                                 {/* Logo Container */}
-                                <div className="relative h-9 w-9 sm:h-11 sm:w-11 bg-white dark:bg-black rounded-full flex items-center justify-center border border-white/20 shadow-2xl overflow-hidden ring-1 ring-white/10">
+                                <div className="relative h-9 w-9 sm:h-10 sm:w-10 bg-white dark:bg-black rounded-full flex items-center justify-center border border-white/20 shadow-2xl overflow-hidden ring-1 ring-white/10">
                                     <img 
-                                        src={ZylronLogo} 
+                                        src="/logo.png" 
                                         alt="Zylron AI" 
                                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
                                     />
@@ -1217,14 +1217,14 @@ const Dashboard = () => {
                                 </div>
 
                                 {/* Active Status Dot */}
-                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 dark:bg-cyan-400 rounded-full border-2 border-white dark:border-black shadow-[0_0_10px_rgba(0,255,255,0.8)]"></div>
+                                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 dark:bg-cyan-400 rounded-full border-2 border-white dark:border-black shadow-[0_0_8px_rgba(0,255,255,0.8)]"></div>
                             </div>
                             
                             <div className="flex flex-col">
-                                <span className="hidden sm:block text-lg sm:text-xl font-black tracking-tighter bg-gradient-to-r from-emerald-500 via-cyan-400 to-blue-500 bg-clip-text text-transparent leading-none">
+                                <span className="text-sm sm:text-xl font-black tracking-tighter bg-gradient-to-r from-emerald-500 via-cyan-400 to-blue-500 bg-clip-text text-transparent leading-none">
                                     Zylron AI
                                 </span>
-                                <span className="hidden sm:block text-[8px] uppercase tracking-[0.3em] font-black text-gray-400 dark:text-cyan-500/50 mt-0.5">
+                                <span className="text-[7px] sm:text-[8px] uppercase tracking-[0.2em] sm:tracking-[0.3em] font-black text-gray-400 dark:text-cyan-500/50 mt-0.5 whitespace-nowrap">
                                     Neural Operating System
                                 </span>
                             </div>
@@ -1478,7 +1478,7 @@ const Dashboard = () => {
                             <div className="flex flex-col items-center mb-6 md:mb-8">
                                 <div className="relative mb-4">
                                     <div className="w-20 h-20 rounded-3xl overflow-hidden border-2 border-cyan-500/40 dark:border-cyan-500/40 border-emerald-400/40 shadow-xl dark:shadow-[0_0_30px_rgba(6,182,212,0.3)] animate-neural-pulse bg-gray-50 dark:bg-black flex items-center justify-center p-2">
-                                        <img src={ZylronLogo} alt="Zylron AI" className="w-full h-full object-contain" />
+                                        <img src="/logo.png" alt="Zylron AI" className="w-full h-full object-contain" />
                                     </div>
                                     <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 dark:bg-cyan-400 rounded-full border-2 border-white dark:border-black shadow-lg animate-pulse" />
                                 </div>
