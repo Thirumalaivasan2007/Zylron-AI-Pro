@@ -385,6 +385,42 @@ const Dashboard = () => {
     const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
     // Feature G: Desktop Notifications
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    // Feature H: Neural Widgets
+    const [showWidgets, setShowWidgets] = useState(false);
+    const [widgetNote, setWidgetNote] = useState(localStorage.getItem('zylron_widget_note') || '');
+    const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+    
+    // Feature I: Neural Pomodoro (Focus Mode)
+    const [focusTimer, setFocusTimer] = useState(25 * 60); // 25 mins
+    const [isTimerActive, setIsTimerActive] = useState(false);
+
+    useEffect(() => {
+        let interval = null;
+        if (isTimerActive && focusTimer > 0) {
+            interval = setInterval(() => setFocusTimer(t => t - 1), 1000);
+        } else if (focusTimer === 0) {
+            setIsTimerActive(false);
+            setFeedbackToast("🎯 Focus Session Complete! Time for a Neural Break.");
+            setTimeout(() => setFeedbackToast(null), 4000);
+        }
+        return () => clearInterval(interval);
+    }, [isTimerActive, focusTimer]);
+
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    };
+
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date().toLocaleTimeString()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const updateWidgetNote = (text) => {
+        setWidgetNote(text);
+        localStorage.setItem('zylron_widget_note', text);
+    };
 
     const messagesEndRef = useRef(null);
     const scrollContainerRef = useRef(null);
@@ -1120,6 +1156,22 @@ const Dashboard = () => {
         }
     };
 
+    const togglePinSession = (sessionId) => {
+        setHistory(prev => prev.map(chat => 
+            chat.sessionId === sessionId ? { ...chat, pinned: !chat.pinned } : chat
+        ));
+        setFeedbackToast("📌 Chat pinned status updated!");
+        setTimeout(() => setFeedbackToast(null), 2000);
+    };
+
+    const updateSessionFolder = (sessionId, folder) => {
+        setHistory(prev => prev.map(chat => 
+            chat.sessionId === sessionId ? { ...chat, folder: folder } : chat
+        ));
+        setFeedbackToast(`📁 Moved to ${folder}!`);
+        setTimeout(() => setFeedbackToast(null), 2000);
+    };
+
     // Feature B2: Keyboard Shortcuts
     useEffect(() => {
         const handler = (e) => {
@@ -1170,6 +1222,8 @@ const Dashboard = () => {
                     handleNewChat={handleNewChat} 
                     currentSessionId={currentSessionId} 
                     deleteSession={deleteSession} 
+                    togglePinSession={togglePinSession}
+                    updateSessionFolder={updateSessionFolder}
                     credits={credits} 
                     xp={xp}
                     onShare={handleShareChat}
@@ -1205,13 +1259,29 @@ const Dashboard = () => {
                                 {/* Circular Neural Glow */}
                                 <div className="absolute -inset-1 bg-gradient-to-tr from-emerald-500/40 via-cyan-500/40 to-purple-500/40 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                 
-                                {/* Circular Logo Container */}
-                                <div className="relative h-8 w-8 sm:h-9 sm:w-9 bg-black/50 rounded-full flex items-center justify-center border border-white/10 shadow-lg overflow-hidden ring-1 ring-cyan-500/20">
+                                {/* Circular Logo Container with Neural Reactivity */}
+                                <div className={`relative h-8 w-8 sm:h-9 sm:w-9 bg-black/50 rounded-full flex items-center justify-center border border-white/10 shadow-lg overflow-hidden ring-1 ring-cyan-500/20 transition-all duration-500 ${isLoading ? 'scale-110 ring-cyan-400 ring-offset-2 ring-offset-black animate-pulse' : ''} ${isSpeakingIndex !== null ? 'scale-105 shadow-[0_0_20px_rgba(34,197,94,0.4)]' : ''}`}>
                                     <img 
                                         src="/logo.png" 
                                         alt="Zylron" 
-                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                        className={`h-full w-full object-cover transition-transform duration-500 ${isLoading ? 'animate-spin-slow brightness-125' : ''} group-hover:scale-110`} 
                                     />
+                                    
+                                    {/* Thinking Overlay */}
+                                    {isLoading && (
+                                        <div className="absolute inset-0 bg-cyan-500/20 animate-neural-pulse flex items-center justify-center">
+                                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>
+                                        </div>
+                                    )}
+
+                                    {/* Speaking Waveform Overlay */}
+                                    {isSpeakingIndex !== null && (
+                                        <div className="absolute bottom-0 left-0 right-0 h-2 bg-emerald-500/40 backdrop-blur-sm flex items-end justify-around pb-0.5">
+                                            <div className="w-0.5 h-full bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                            <div className="w-0.5 h-full bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                            <div className="w-0.5 h-full bg-white rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Active Status Dot */}
@@ -1400,7 +1470,11 @@ const Dashboard = () => {
                             {isFocusMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
                         </button>
 
-                        {/* Desktop Notifications */}
+                        {/* Neural Widgets Toggle */}
+                        <button onClick={() => setShowWidgets(p => !p)} className={`p-2 rounded-full transition-all focus:outline-none hidden lg:flex ${showWidgets ? 'text-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 shadow-[0_0_10px_rgba(6,182,212,0.3)]' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`} title="Neural Widgets (Notes/Time)">
+                            <Box size={20} />
+                        </button>
+
                         <button onClick={enableDesktopNotifications} className={`p-2 rounded-full transition-all focus:outline-none hidden md:flex ${notificationsEnabled ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`} title="Desktop Notifications">
                             <BellRing size={20} />
                         </button>
@@ -1481,6 +1555,28 @@ const Dashboard = () => {
                                     </div>
                                     {/* Orbital Glow */}
                                     <div className="absolute inset-0 bg-cyan-500/10 blur-3xl rounded-full -z-10 group-hover:bg-cyan-500/20 transition-all duration-700"></div>
+                                    {/* Neural Pomodoro (Only in Focus Mode) */}
+                                    {isFocusMode && (
+                                        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] animate-in slide-in-from-top-4 duration-500">
+                                            <div className="bg-black/80 backdrop-blur-2xl border border-white/10 px-6 py-3 rounded-full shadow-2xl flex items-center gap-6 ring-1 ring-cyan-500/30">
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-[8px] uppercase tracking-[0.2em] font-black text-cyan-400">Deep Work</span>
+                                                    <span className="text-2xl font-black tracking-tighter tabular-nums text-white">
+                                                        {formatTime(focusTimer)}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <button onClick={() => setIsTimerActive(!isTimerActive)} className={`p-2 rounded-full transition-all ${isTimerActive ? 'bg-amber-500/20 text-amber-500' : 'bg-emerald-500/20 text-emerald-500'}`}>
+                                                        {isTimerActive ? <VolumeX size={16} /> : <Play size={16} />}
+                                                    </button>
+                                                    <button onClick={() => { setFocusTimer(25 * 60); setIsTimerActive(false); }} className="p-2 rounded-full bg-white/5 text-gray-400 hover:text-white transition-all">
+                                                        <RefreshCw size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="absolute top-1 right-1 w-6 h-6 bg-emerald-500 dark:bg-cyan-400 rounded-full border-4 border-white dark:border-black shadow-[0_0_15px_rgba(0,255,255,0.6)] animate-pulse z-10" />
                                 </div>
                                 <h1 className="text-3xl md:text-5xl font-bold text-center mb-2">

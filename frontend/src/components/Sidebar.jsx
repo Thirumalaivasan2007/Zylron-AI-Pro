@@ -1,12 +1,21 @@
-import { Plus, Trash2, MessageSquare, Zap, Search, RefreshCw, Share2, FileDown, HelpCircle, Download } from 'lucide-react';
+import { Plus, Trash2, MessageSquare, Zap, Search, RefreshCw, Share2, FileDown, HelpCircle, Download, Pin } from 'lucide-react';
 import { useState } from 'react';
 
-const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, deleteSession, credits = 0, xp = 0, onShare, onExportPDF, onExportMD, onTour, onAdmin }) => {
+const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, deleteSession, togglePinSession, updateSessionFolder, credits = 0, xp = 0, onShare, onExportPDF, onExportMD, onTour, onAdmin }) => {
     const [searchQuery, setSearchQuery] = useState('');
+    const [activeFolder, setActiveFolder] = useState('all');
+    const FOLDERS = [
+        { id: 'all', label: 'All Chats', icon: <MessageSquare size={14} /> },
+        { id: 'work', label: 'Work', icon: <Zap size={14} /> },
+        { id: 'research', label: 'Research', icon: <Search size={14} /> },
+        { id: 'personal', label: 'Personal', icon: <Plus size={14} /> }
+    ];
 
-    const filteredHistory = history.filter(chat => 
-        chat.message.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredHistory = history.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).filter(chat => {
+        const matchesSearch = chat.message.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFolder = activeFolder === 'all' || (chat.folder || 'personal') === activeFolder;
+        return matchesSearch && matchesFolder;
+    });
 
     return (
         <div className="w-72 h-full bg-white/80 dark:bg-[#0f172a]/90 backdrop-blur-xl border-r border-gray-200/50 dark:border-cyan-900/30 flex flex-col transition-colors duration-300">
@@ -29,6 +38,19 @@ const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, delete
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-gray-50 dark:bg-black/40 border border-gray-100 dark:border-gray-800 rounded-xl py-2 pl-10 pr-4 text-xs focus:outline-none focus:border-emerald-300 dark:focus:border-cyan-500/50 transition-all text-gray-700 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-600"
                     />
+                </div>
+
+                {/* Folders Navigation */}
+                <div className="flex gap-1 overflow-x-auto custom-scrollbar pb-1">
+                    {FOLDERS.map(f => (
+                        <button
+                            key={f.id}
+                            onClick={() => setActiveFolder(f.id)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold whitespace-nowrap transition-all ${activeFolder === f.id ? 'bg-emerald-500/10 text-emerald-600 dark:text-cyan-400 border border-emerald-500/20 shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                        >
+                            {f.icon} {f.label}
+                        </button>
+                    ))}
                 </div>
             </div>
 
@@ -68,24 +90,36 @@ const Sidebar = ({ history, loadSession, handleNewChat, currentSessionId, delete
                                 onClick={() => loadSession(chat.sessionId)}
                                 className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-300 cursor-pointer group flex items-center justify-between gap-3 ${currentSessionId === chat.sessionId ? 'bg-emerald-100/50 dark:bg-cyan-900/40 text-emerald-900 dark:text-cyan-300 shadow-[inset_0_0_20px_rgba(0,255,255,0.05)] border border-emerald-200/50 dark:border-cyan-800/50' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-cyan-950/30 hover:text-gray-900 dark:hover:text-gray-200 border border-transparent'}`}
                             >
-                                <div className="flex items-center gap-3 flex-1 overflow-hidden">
-                                    <MessageSquare size={16} className={`shrink-0 ${currentSessionId === chat.sessionId ? 'text-emerald-500 dark:text-cyan-400' : 'text-gray-400 dark:text-gray-600'}`} />
-                                    <div className="truncate text-sm font-medium">
-                                        {chat.message}
+                                <div className="flex flex-col gap-1 min-w-0 flex-1">
+                                    <div className="flex items-center gap-2">
+                                        {chat.pinned && <Pin size={10} className="text-amber-500 shrink-0" />}
+                                        <div className="truncate text-sm font-medium">
+                                            {chat.message}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-1 pr-1">
+                                        {/* Folder Selection (Compact) */}
+                                        <select 
+                                            value={chat.folder || 'personal'} 
+                                            onClick={(e) => e.stopPropagation()}
+                                            onChange={(e) => { e.stopPropagation(); updateSessionFolder(chat.sessionId, e.target.value); }}
+                                            className="bg-transparent text-[9px] text-gray-400 hover:text-cyan-500 border-none p-0 focus:outline-none cursor-pointer"
+                                        >
+                                            <option value="personal">Personal</option>
+                                            <option value="work">Work</option>
+                                            <option value="research">Research</option>
+                                        </select>
+
+                                        <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
+                                            <button onClick={(e) => { e.stopPropagation(); togglePinSession(chat.sessionId); }} className="p-1 hover:bg-gray-200 dark:hover:bg-black/40 rounded transition-all">
+                                                <Pin size={12} className={chat.pinned ? 'text-amber-500 fill-amber-500' : 'text-gray-400'} />
+                                            </button>
+                                            <button onClick={(e) => { e.stopPropagation(); deleteSession(chat.sessionId); }} className="p-1 hover:bg-red-500/10 hover:text-red-500 rounded">
+                                                <Trash2 size={12} className="text-gray-400" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (window.confirm("Delete this cloud session permanently?")) {
-                                            deleteSession(chat.sessionId);
-                                        }
-                                    }}
-                                    className="text-gray-400 hover:text-red-500 p-1.5 rounded-xl hover:bg-white dark:hover:bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300 flex-shrink-0 focus:outline-none"
-                                    title="Delete session"
-                                >
-                                    <Trash2 size={16} />
-                                </button>
                             </div>
                         ))
                     )}
