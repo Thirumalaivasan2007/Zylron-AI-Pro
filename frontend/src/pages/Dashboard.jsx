@@ -1345,7 +1345,7 @@ const Dashboard = () => {
 
                         <button 
                             onClick={() => setIsAdminModalOpen(true)}
-                            className="p-2 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 transition-all border border-cyan-500/20 shadow-lg shadow-cyan-500/5 group"
+                            className="p-2 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 transition-all border border-cyan-500/20 shadow-lg shadow-cyan-500/5 group hidden xl:flex"
                             title="Admin Diagnostics"
                         >
                             <Activity size={18} className="group-hover:scale-110 transition-transform" />
@@ -1353,7 +1353,7 @@ const Dashboard = () => {
 
                         <button 
                             onClick={() => setIsSettingsModalOpen(true)}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none hidden sm:flex"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none hidden lg:flex"
                             title="Open Settings"
                         >
                             <Settings size={20} />
@@ -1474,14 +1474,14 @@ const Dashboard = () => {
                         <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 animate-fade-in overflow-y-auto">
                             {/* Logo + Title */}
                             <div className="flex flex-col items-center mb-6 md:mb-8">
-                                <div className="relative mb-8 flex items-center justify-center group">
-                                    <div className="relative h-28 w-28 md:h-36 md:w-36 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl transition-all duration-700 hover:scale-105 ring-4 ring-cyan-500/20">
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 via-cyan-500/20 to-purple-500/20 blur-xl"></div>
-                                        <img src="/logo.png" alt="Zylron AI" className="relative h-full w-full object-cover" />
+                                <div className="relative mb-8 group">
+                                    <div className="relative h-28 w-28 md:h-36 md:w-36 rounded-full border-2 border-white/10 shadow-2xl transition-all duration-700 hover:scale-105 ring-4 ring-cyan-500/20 bg-black overflow-hidden flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 via-cyan-500/10 to-purple-500/10 blur-xl"></div>
+                                        <img src="/logo.png" alt="Zylron AI" className="h-full w-full object-cover" />
                                     </div>
                                     {/* Orbital Glow */}
                                     <div className="absolute inset-0 bg-cyan-500/10 blur-3xl rounded-full -z-10 group-hover:bg-cyan-500/20 transition-all duration-700"></div>
-                                    <div className="absolute -top-1 -right-1 w-7 h-7 bg-emerald-500 dark:bg-cyan-400 rounded-full border-4 border-white dark:border-black shadow-[0_0_20px_rgba(0,255,255,0.6)] animate-pulse z-10" />
+                                    <div className="absolute top-1 right-1 w-6 h-6 bg-emerald-500 dark:bg-cyan-400 rounded-full border-4 border-white dark:border-black shadow-[0_0_15px_rgba(0,255,255,0.6)] animate-pulse z-10" />
                                 </div>
                                 <h1 className="text-3xl md:text-5xl font-bold text-center mb-2">
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 dark:from-cyan-400 dark:via-blue-400 dark:to-emerald-400">
