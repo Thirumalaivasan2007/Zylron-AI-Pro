@@ -1193,7 +1193,7 @@ const Dashboard = () => {
                 
                 {/* Top Nav Header - Gemini Style */}
                 <div className="sticky top-0 z-40 h-14 sm:h-16 w-full bg-white/80 dark:bg-black/50 backdrop-blur-xl border-b border-gray-200 dark:border-gray-900 flex items-center justify-between px-3 sm:px-6 transition-all duration-300">
-                    <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                         <button 
                             onClick={() => setSidebarOpen(!sidebarOpen)} 
                             className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-600 dark:text-gray-300 transition-all focus:outline-none sidebar-trigger"
@@ -1291,7 +1291,7 @@ const Dashboard = () => {
                         <button 
                             onClick={handleShareChat}
                             disabled={messages.length === 0}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed flex"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed hidden xl:flex"
                             title="Share Conversation"
                         >
                             <Share2 size={20} />
@@ -1300,7 +1300,7 @@ const Dashboard = () => {
                         <button 
                             onClick={exportToPDF}
                             disabled={messages.length === 0}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed flex"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed hidden lg:flex"
                             title="Download PDF Report"
                         >
                             <FileDown size={20} />
@@ -1323,7 +1323,7 @@ const Dashboard = () => {
                                 setIsContinuousVoice(newState);
                                 localStorage.continuousVoice = newState;
                             }}
-                            className={`p-2 rounded-full transition-all focus:outline-none ${isContinuousVoice ? 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600 dark:text-cyan-400 shadow-[0_0_20px_rgba(0,255,255,0.4)]' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`}
+                            className={`p-2 rounded-full transition-all focus:outline-none hidden md:flex ${isContinuousVoice ? 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600 dark:text-cyan-400 shadow-[0_0_20px_rgba(0,255,255,0.4)]' : 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400'}`}
                             title="Toggle Continuous Voice Mode"
                         >
                             <Mic size={20} className={isContinuousVoice ? "animate-pulse" : ""} />
@@ -1331,7 +1331,7 @@ const Dashboard = () => {
 
                         <button 
                             onClick={() => setIsTourActive(true)}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none hidden sm:flex"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-500 dark:text-gray-400 transition-all focus:outline-none hidden lg:flex"
                             title="Start Guided Tour"
                         >
                             <HelpCircle size={20} />
