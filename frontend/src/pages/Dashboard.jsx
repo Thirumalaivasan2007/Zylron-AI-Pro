@@ -1200,9 +1200,12 @@ const Dashboard = () => {
                         >
                             <Menu size={22} />
                         </button>
-                        <div className="flex items-center gap-2 lg:gap-3 text-emerald-600 dark:text-cyan-400 font-bold text-base sm:text-xl drop-shadow-sm dark:drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">
-                            <img src={ZylronLogo} alt="Zylron AI Logo" className="h-7 w-7 sm:h-9 sm:w-9 rounded-full shadow-md object-cover mr-1" />
-                            <span className="hidden sm:block text-sm sm:text-lg">Zylron AI</span>
+                        <div className="flex items-center gap-2 lg:gap-3 text-emerald-600 dark:text-cyan-400 font-bold text-base sm:text-xl drop-shadow-sm dark:drop-shadow-[0_0_8px_rgba(0,255,255,0.6)]">
+                            <div className="relative flex items-center justify-center">
+                                <div className="absolute inset-0 bg-cyan-500/20 dark:bg-cyan-400/20 blur-lg rounded-full animate-pulse"></div>
+                                <img src={ZylronLogo} alt="Zylron AI Logo" className="relative h-8 w-8 sm:h-10 sm:w-10 object-contain mr-1 hover:scale-110 transition-transform duration-500 cursor-pointer" />
+                            </div>
+                            <span className="hidden sm:block text-sm sm:text-lg tracking-tight bg-gradient-to-r from-emerald-600 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">Zylron AI</span>
                         </div>
                     </div>
 
@@ -1452,8 +1455,8 @@ const Dashboard = () => {
                             {/* Logo + Title */}
                             <div className="flex flex-col items-center mb-6 md:mb-8">
                                 <div className="relative mb-4">
-                                    <div className="w-20 h-20 rounded-3xl overflow-hidden border-2 border-cyan-500/40 dark:border-cyan-500/40 border-emerald-400/40 shadow-xl dark:shadow-[0_0_30px_rgba(6,182,212,0.3)] animate-neural-pulse">
-                                        <img src={ZylronLogo} alt="Zylron AI" className="w-full h-full object-cover" />
+                                    <div className="w-20 h-20 rounded-3xl overflow-hidden border-2 border-cyan-500/40 dark:border-cyan-500/40 border-emerald-400/40 shadow-xl dark:shadow-[0_0_30px_rgba(6,182,212,0.3)] animate-neural-pulse bg-gray-50 dark:bg-black flex items-center justify-center p-2">
+                                        <img src={ZylronLogo} alt="Zylron AI" className="w-full h-full object-contain" />
                                     </div>
                                     <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 dark:bg-cyan-400 rounded-full border-2 border-white dark:border-black shadow-lg animate-pulse" />
                                 </div>
@@ -1654,8 +1657,9 @@ const Dashboard = () => {
                             {isLoading && (
                                 <div className="flex justify-start">
                                     <div className="max-w-[85%] md:max-w-3xl flex gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-white dark:bg-black border border-gray-200 dark:border-cyan-500/30 flex items-center justify-center shrink-0 shadow-sm dark:shadow-[0_0_10px_rgba(0,255,255,0.2)] transition-all duration-300 overflow-hidden">
-                                            <img src={ZylronLogo} alt="Zylron AI" className="h-8 w-8 rounded-full object-cover animate-pulse" />
+                                        <div className="w-10 h-10 rounded-full bg-white dark:bg-black border border-gray-200 dark:border-cyan-500/30 flex items-center justify-center shrink-0 shadow-sm dark:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300 overflow-hidden relative">
+                                            <div className="absolute inset-0 bg-cyan-500/10 animate-pulse"></div>
+                                            <img src={ZylronLogo} alt="Zylron AI" className="h-7 w-7 relative object-contain animate-pulse" />
                                         </div>
                                         <div className="px-5 py-4 rounded-3xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-sm flex items-center gap-2 shadow-sm dark:shadow-lg">
                                             <div className="typing-dot w-2 h-2 rounded-full bg-gray-400 dark:bg-cyan-500 dark:shadow-[0_0_8px_rgba(0,255,255,0.8)]"></div>
