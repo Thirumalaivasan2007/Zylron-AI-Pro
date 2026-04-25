@@ -1471,7 +1471,7 @@ const Dashboard = () => {
 
                     {messages.length === 0 ? (
                         /* Premium Welcome State — 15 Features Showcase */
-                        <div className="h-full flex flex-col items-center justify-start p-4 md:p-8 pt-10 md:pt-16 animate-fade-in overflow-y-auto custom-scrollbar">
+                        <div className="flex-1 min-h-0 flex flex-col items-center justify-start p-4 md:p-8 py-10 md:py-16 animate-fade-in overflow-y-auto custom-scrollbar">
                             {/* Logo + Title */}
                             <div className="flex flex-col items-center mb-6 md:mb-8">
                                 <div className="relative mb-8 group">
