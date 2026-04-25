@@ -1657,9 +1657,8 @@ const Dashboard = () => {
                             {isLoading && (
                                 <div className="flex justify-start">
                                     <div className="max-w-[85%] md:max-w-3xl flex gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-white dark:bg-black border border-gray-200 dark:border-cyan-500/30 flex items-center justify-center shrink-0 shadow-sm dark:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300 overflow-hidden relative">
-                                            <div className="absolute inset-0 bg-cyan-500/10 animate-pulse"></div>
-                                            <img src={ZylronLogo} alt="Zylron AI" className="h-7 w-7 relative object-contain animate-pulse" />
+                                        <div className="w-10 h-10 rounded-full bg-white dark:bg-black border border-gray-200 dark:border-cyan-500/30 flex items-center justify-center shrink-0 shadow-sm dark:shadow-[0_0_10px_rgba(0,255,255,0.2)] transition-all duration-300 overflow-hidden">
+                                            <img src={ZylronLogo} alt="Zylron AI" className="h-8 w-8 rounded-full object-cover animate-pulse" />
                                         </div>
                                         <div className="px-5 py-4 rounded-3xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-sm flex items-center gap-2 shadow-sm dark:shadow-lg">
                                             <div className="typing-dot w-2 h-2 rounded-full bg-gray-400 dark:bg-cyan-500 dark:shadow-[0_0_8px_rgba(0,255,255,0.8)]"></div>
